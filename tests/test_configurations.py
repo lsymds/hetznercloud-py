@@ -1,6 +1,6 @@
 import unittest
 
-from hetznercloudpy import HetznerCloudClientConfiguration, HetznerCloudClient, HetznerConfigurationException
+from hetznercloud import HetznerCloudClientConfiguration, HetznerCloudClient, HetznerConfigurationException
 
 
 class TestConfigurations(unittest.TestCase):
