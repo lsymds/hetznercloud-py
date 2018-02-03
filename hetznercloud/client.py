@@ -32,6 +32,7 @@ class HetznerCloudClientConfiguration(object):
         available (1), so using this method to pick a different version will result in a configuration exception being
         raised when this object is passed into the HetznerCloudClient constructor.
 
+        :rtype: object
         :param version: The version of the client to use.
         :return: The current instance of the cloud configuration object to allow fluent chaining.
         """
