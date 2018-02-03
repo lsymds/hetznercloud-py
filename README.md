@@ -4,6 +4,7 @@ A Python SDK for the new (and wonderful) Hetzner cloud service.
 
 * [State](#state)
 * [Usage](#documentation)
+    * [Installation](#installation)
     * [Getting started](#getting-started)
         * [A note on actions](#a-note-on-actions)
         * [Standard exceptions](#standard-exceptions)
@@ -35,6 +36,14 @@ progress made on it so far.
 This library is organised into two components: the first, a set of actions that retrieve an actionable component. 
 These actionable components (for example servers) each have their own methods that modify their own (and only their own)
 behaviour. 
+
+### Installation
+
+Install the library into your environment by executing the following command in your terminal:
+
+```bash
+pip install hetznercloud
+```
 
 ### Getting started
 
