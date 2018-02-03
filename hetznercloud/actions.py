@@ -1,6 +1,7 @@
 import time
 
-from .exceptions import HetznerWaitAttemptsExceededException
+from .constants import ACTION_STATUS_ERROR
+from .exceptions import HetznerWaitAttemptsExceededException, HetznerInternalServerErrorException
 from .shared import _get_results
 
 
@@ -39,10 +40,13 @@ class HetznerCloudAction(object):
             return
 
         for i in range(0, attempts):
-            action_status = _get_action_json(self.config, self.id)["status"]
-            if action_status == status:
+            action_status = _get_action_json(self.config, self.id)
+            if action_status["status"] == status:
                 self.status = action_status
                 return
+
+            if action_status["status"] == ACTION_STATUS_ERROR:
+                raise HetznerInternalServerErrorException(action_status["error"])
 
             time.sleep(wait_seconds)
 

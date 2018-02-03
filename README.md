@@ -94,7 +94,9 @@ Constants that represent the different statuses a server can have.
 
 Constants that represent the different statuses an action can have.
 
+* `ACTION_STATUS_RUNNING` - The action is currently running.
 * `ACTION_STATUS_SUCCESS` - The action completed successfully.
+* `ACTION_STATUS_ERROR` - The action terminated due to an error.
 
 ##### Server types
 
