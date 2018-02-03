@@ -215,7 +215,22 @@ is an error present in the response.
 
 #### Enable rescue mode
 
-To enable rescue mode, 
+To enable rescue mode, simply call the `enable_rescue_mode()` method on the server object. You can specify a rescue
+image and an array of SSH keys to load into it.
+
+*NOTE*: If you use the FreeBSD rescue image, you will not be able to load in any SSH keys.
+
+*NOTE:* If you want to use the rescue mode, you will need to reboot your server. This method will not automatically
+do that for you.
+
+```python
+server, _ = client.servers().get(1)
+root_password, enable_action = server.enable_rescue_mode(rescue_type=RESCUE_TYPE_LINUX32, ssh_keys=["my-ssh-key"])
+
+enable_action.wait_until_status_is(ACTION_STATUS_SUCCESS)
+
+print("Your root password for the rescue mode is %s" % root_password)
+```
 
 #### Wait for server status
 
@@ -229,7 +244,7 @@ or the condition matches.
 This is useful when you want to ensure your server is of a particular state before performing any actions on it.
 
 ```python
-server, _ = client.servers().get()
+server, _ = client.servers().get(1)
 
 try:
     server.wait_until_status_is(SERVER_STATUS_OFF, attempts=50, wait_seconds=10)
