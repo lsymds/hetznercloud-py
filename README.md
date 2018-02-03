@@ -1,4 +1,4 @@
-# hetznercloud-py
+# Hetzner Cloud Python SDK
 
 A Python SDK for the new (and wonderful) Hetzner cloud service.
 
@@ -18,6 +18,9 @@ A Python SDK for the new (and wonderful) Hetzner cloud service.
             * [Get server by id](#get-server-by-id)
             * [Create server](#create-server)
         * [Modifier actions (applies to a specific server)](#server-modifier-actions)
+            * [Delete](#delete-server)
+            * [Disable rescue mode](#disable-rescue-mode)
+            * [Enable rescue mode](#enable-rescue-mode)
 
 ## State
 
@@ -35,7 +38,7 @@ behaviour.
 In order to get started with the library, you first need an instance of it. This is very simple, and uses a number
 of hand-crafted helper functions to make configuration changes.
 
-```
+```python
 from hetznercloud import HetznerCloudClientConfiguration, HetznerCloudClient
 
 configuration = HetznerCloudClientConfiguration().with_api_key("YOUR-API-KEY").with_api_version(1)
@@ -111,7 +114,7 @@ the object returned by this top level action in order to modify the state of ind
 
 All servers associated with the API key you provided can be retrieved by calling the `get_all()` top level action method.
 
-```
+```python
 all_servers = client.servers().get_all() # gets all the servers as a generator
 all_servers_list = list(client.servers().get_all()) # gets all the servers as a list
 ```
@@ -121,7 +124,7 @@ all_servers_list = list(client.servers().get_all()) # gets all the servers as a 
 By calling the `get_all(name="my-server-name")` method (with the optional `name` parameter entered), you can bring back
 the servers that have the name entered.
 
-```
+```python
 all_servers = client.servers().get_all(name="foo") # gets all the servers as a generator
 all_servers_list = list(client.servers().get_all(name="foo")) # gets all the servers as a list
 ```
@@ -130,7 +133,7 @@ all_servers_list = list(client.servers().get_all(name="foo")) # gets all the ser
 
 If you know the id of the server you wish to retrieve you can use this method to retrieve that specific server.
 
-```
+```python
 try:
     server = client.servers().get(1)
 catch HetznerServerNotFoundException:
@@ -147,7 +150,7 @@ This method throws a `HetznerServerNotFoundException` if the following condition
 To create a server, you can call the `create` top level action method. This method accepts a number of parameters (some
 are optional, some aren't).
 
-```
+```python
 my_new_server, create_action = client.servers().create(name="My required server name", # REQUIRED
     server_type=hetznercloud.SERVER_TYPE_1CPU_2GB, # REQUIRED
     image=hetznercloud.IMAGE_UBUNTU_1604, # REQUIRED
@@ -163,3 +166,20 @@ This method throws a `HetznerInvalidArgumentException` if the required parameter
 valid values.
 
 This method throws a `HetznerServerActionException` if an error is returned whilst creating the server.
+
+### Server modifier actions
+
+Once you have an instance of the server (retrieved by using one of the "Top level actions" above), you are able to
+perform different modifier actions on them.
+
+#### Delete server
+
+To delete the server, call the `delete()` method on the `HetznerCloudServer` object.
+
+```python
+server, _ = client.servers().get(1)
+server.delete()
+```
+
+This method throws a `HetznerServerActionException` if the status code returned from the API is not 200 or if there
+is an error present in the response.
