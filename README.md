@@ -8,6 +8,8 @@ A Python SDK for the new (and wonderful) Hetzner cloud service.
         * [A note on actions](#a-note-on-actions)
         * [Standard exceptions](#standard-exceptions)
         * [Constants](#constants)
+            * [Server Statuses](#server-statuses)
+            * [Action statuses](#action-statuses)
             * [Server types](#server-types)
             * [Images](#image-types)
             * [Datacentres](#datacentre-constants)
@@ -21,6 +23,7 @@ A Python SDK for the new (and wonderful) Hetzner cloud service.
             * [Delete](#delete-server)
             * [Disable rescue mode](#disable-rescue-mode)
             * [Enable rescue mode](#enable-rescue-mode)
+            * [Wait for status](#wait-for-server-status)
 
 ## State
 
@@ -52,8 +55,8 @@ The client is your entry point to the SDK.
 Methods that modify server state (such as creating, imaging, snapshotting, deleting etc) generally return a tuple. The
 first value of this tuple is normally the object type modified (i.e. a server), whilst the second value is the action. 
 
-The `HetznerCloudAction` object (second value in the tuple) can be used to wait for certain states to be achieved before
-continuing. For more information, see the [Actions](#actions) section.
+The `HetznerCloudAction` object (second value in the tuple) can be used to wait for certain states of that invoked task 
+to be achieved before continuing. For more information, see the [Actions](#actions) section.
 
 #### Constants
 
@@ -63,6 +66,26 @@ and so on.
 *Please note:* I endeavour to keep the constants up to date, but sometimes it is just not possible. Should
 this happen, feel free to use plain-ole strings (i.e. cx11 for the smallest cloud instance) in their place until I get
 around to deploying the update.
+
+##### Server statuses
+
+Constants that represent the different statuses a server can have.
+
+* `SERVER_STATUS_RUNNING` - The server is running.
+* `SERVER_STATUS_INITIALIZING` - The server is running its initialisation cycle.
+* `SERVER_STATUS_STARTING` - The server is starting after being powered off.
+* `SERVER_STATUS_STOPPING` - The server is stopping (shutting down).
+* `SERVER_STATUS_OFF` - The server is turned off.
+* `SERVER_STATUS_DELETING` - The server is being deleted.
+* `SERVER_STATUS_MIGRATING` - The server is being migrated.
+* `SERVER_STATUS_REBUILDING` - The server is being rebuilt.
+* `SERVER_STATUS_UNKNOWN` - The status of the server is unknown.`
+
+##### Action statuses
+
+Constants that represent the different statuses an action can have.
+
+* `ACTION_STATUS_SUCCESS` - The action completed successfully.
 
 ##### Server types
 
@@ -136,7 +159,7 @@ If you know the id of the server you wish to retrieve you can use this method to
 ```python
 try:
     server = client.servers().get(1)
-catch HetznerServerNotFoundException:
+except HetznerServerNotFoundException:
     print("Woops, server not found!")
 ```
 
@@ -151,15 +174,16 @@ To create a server, you can call the `create` top level action method. This meth
 are optional, some aren't).
 
 ```python
-my_new_server, create_action = client.servers().create(name="My required server name", # REQUIRED
+server_a, _ = client.servers().create(name="My required server name", # REQUIRED
     server_type=hetznercloud.SERVER_TYPE_1CPU_2GB, # REQUIRED
     image=hetznercloud.IMAGE_UBUNTU_1604, # REQUIRED
     datacenter=hetznercloud.DATACENTER_FALKENSTEIN_1,
     start_after_create=True,
     ssh_keys=["my-ssh-key-1", "my-ssh-key-2"],
     user_data="rm -rf a-file")
+server_a.wait_until_status_is(SERVER_STATUS_RUNNING) 
     
-print(my_new_server.id)
+print(server_a.id)
 ```
 
 This method throws a `HetznerInvalidArgumentException` if the required parameters detailed above are not specified with
@@ -178,8 +202,40 @@ To delete the server, call the `delete()` method on the `HetznerCloudServer` obj
 
 ```python
 server, _ = client.servers().get(1)
-server.delete()
+action = server.delete()
+
+# Wait until the delete action has completed.
+action.wait_until_status_is(ACTION_STATUS_SUCCESS)
 ```
 
 This method throws a `HetznerServerActionException` if the status code returned from the API is not 200 or if there
 is an error present in the response.
+
+#### Disable rescue mode
+
+#### Enable rescue mode
+
+To enable rescue mode, 
+
+#### Wait for server status
+
+You can wait for a server to have a particular status by calling the `wait_until_status_is(desired_status)` method on
+the server object.
+
+This method will loop a set number of times (defined by the `attempts` parameter) and pause each time for one second
+(or a timespan defined by modifying the wait_seconds parameter) until the number of attempts is exceeded
+or the condition matches.
+
+This is useful when you want to ensure your server is of a particular state before performing any actions on it.
+
+```python
+server, _ = client.servers().get()
+
+try:
+    server.wait_until_status_is(SERVER_STATUS_OFF, attempts=50, wait_seconds=10)
+except HetznerWaitAttemptsExceededException:
+    print("Server status was not updated in 50 attempts") 
+```
+
+This method throws a `HetznerWaitAttemptsExceededException` should the amount of attempts be exceeded with the condition
+still being unmet.

@@ -1,7 +1,18 @@
-from hetznercloud.actions import HetznerCloudAction
-from .exceptions import HetznerServerNotFoundException, HetznerInvalidArgumentException, HetznerServerActionException
+import time
+
+from .actions import HetznerCloudAction
+from .exceptions import HetznerServerNotFoundException, HetznerInvalidArgumentException, HetznerServerActionException, \
+    HetznerWaitAttemptsExceededException
 from .shared import _get_results
-from .constants import RESCUE_TYPE_LINUX
+from .constants import RESCUE_TYPE_LINUX, RESCUE_TYPE_FREEBSD
+
+
+def _get_server_json(config, server_id):
+    status_code, result = _get_results(config, "servers/%s" % server_id)
+    if status_code == 404:
+        raise HetznerServerNotFoundException()
+
+    return result["server"]
 
 
 class HetznerCloudServersAction(object):
@@ -53,11 +64,7 @@ class HetznerCloudServersAction(object):
         if not isinstance(server_id, int) or server_id == 0:
             raise HetznerServerNotFoundException()
 
-        status_code, result = _get_results(self.config, "servers/%s" % server_id)
-        if status_code == 404:
-            raise HetznerServerNotFoundException()
-
-        return HetznerCloudServer._load_from_json(self._config, result["server"])
+        return HetznerCloudServer._load_from_json(self._config, _get_server_json(self._config, server_id))
 
     def create(self, name, server_type, image, datacenter=None, start_after_create=True, ssh_keys=[], user_data=None):
         """
@@ -147,7 +154,7 @@ class HetznerCloudServer(object):
         Deletes the server, making it immediately unavailable for any further use.
         """
         status_code, result = _get_results(self._config, "servers/%s" % self.id, method="DELETE")
-        if status_code != 200 or ("error" in result):
+        if status_code != 200 or "error" in result:
             raise HetznerServerActionException(result["error"] if "error" in result else None)
 
         return HetznerCloudAction._load_from_json(self._config, result["action"])
@@ -168,14 +175,50 @@ class HetznerCloudServer(object):
 
         :param rescue_type: The rescue image to use.
         :param ssh_keys: An array of SSH key ids to load into the rescue mode (if it is linux based)
+        :return: A tuple containing the root SSH password to access the recovery mode and the action to track the
+                 progress of the request.
         """
-        pass
+        body = {
+            "type": rescue_type
+        }
+
+        if ssh_keys and len(ssh_keys > 0) and rescue_type != RESCUE_TYPE_FREEBSD:
+            body["ssh_keys"] = ssh_keys
+
+        status_code, result = _get_results(self._config, "servers/%s/actions/enable_rescue" % self.id, method="POST",
+                                           body=body)
+        if status_code != 201 or "error" in result:
+            raise HetznerServerActionException(result["error"] if "error" in result else None)
+
+        return result["root_password"], HetznerCloudAction._load_from_json(self._config, result["action"])
 
     def disable_rescue_mode(self):
         pass
 
     def image(self, description=None, image_type="snapshot"):
         pass
+
+    def wait_until_status_is(self, status, attempts=20, wait_seconds=1):
+        """
+        Sleeps the executing thread (a second each loop) until the status is either what the user requires or the
+        attempt count is exceeded, in which case an exception is thrown.
+        :param status: The status the action needs to be.
+        :param attempts: The number of attempts to query the action's status.
+        :param wait_seconds: The number of seconds to wait for between each attempt.
+        :return: An exception, unless the status matches the status parameter.
+        """
+        if self.status == status:
+            return
+
+        for i in range(0, attempts):
+            server_status = _get_server_json(self._config, self.id)["status"]
+            if server_status == status:
+                self.status = server_status
+                return
+
+            time.sleep(wait_seconds)
+
+        raise HetznerWaitAttemptsExceededException()
 
     @staticmethod
     def _load_from_json(config, json, root_password=None):

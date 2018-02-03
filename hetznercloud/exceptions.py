@@ -47,6 +47,7 @@ class HetznerInvalidArgumentException(Exception):
         else:
             super().__init__("An invalid argument was (or was not) entered: %s." % argument)
 
+
 class HetznerServerActionException(Exception):
     """
     HetznerServerCreateException is an exception that is raised whenever an action of a server fails.
@@ -55,3 +56,10 @@ class HetznerServerActionException(Exception):
     def __init__(self, error_code):
         if error_code is not None:
             super().__init__("Failed to perform the requested action on the server: %s" % error_code)
+
+
+class HetznerWaitAttemptsExceededException(Exception):
+    """
+    HetznerWaitAttemptsExceededException is an exception that is raised when the amount of wait attempts on a wait
+    function is exceeded.
+    """

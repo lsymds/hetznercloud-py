@@ -1,6 +1,4 @@
-import time
-
-from hetznercloud import STATUS_OFF
+from hetznercloud import SERVER_STATUS_OFF, ACTION_STATUS_SUCCESS, SERVER_STATUS_RUNNING
 from tests.base import BaseHetznerTest
 
 
@@ -35,13 +33,13 @@ class TestServers(BaseHetznerTest):
 
         self.assertIsNotNone(created_server)
         self.assertIsNotNone(created_server.id)
+        created_server.wait_until_status_is(SERVER_STATUS_OFF)
 
-        for i in range(0, 10):
-            server = list(self.servers.get_all(name="test-server-can-be-created-but-offline"))[0]
-            if server.status == STATUS_OFF:
-                return
+    def test_rescue_mode_can_be_added_to_a_server(self):
+        created_server, _ = self.servers.create("test-rescue-mode-can-be-added-to-a-server", "cx11", "ubuntu-16.04")
+        created_server.wait_until_status_is(SERVER_STATUS_RUNNING)
 
-            time.sleep(2)
-            i += 1
+        root_password, action = created_server.enable_rescue_mode()
+        self.assertIsNotNone(root_password)
+        action.wait_until_status_is(ACTION_STATUS_SUCCESS)
 
-        self.fail()
