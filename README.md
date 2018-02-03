@@ -201,7 +201,7 @@ perform different modifier actions on them.
 To delete the server, call the `delete()` method on the `HetznerCloudServer` object.
 
 ```python
-server, _ = client.servers().get(1)
+server = client.servers().get(1)
 action = server.delete()
 
 # Wait until the delete action has completed.
@@ -224,7 +224,7 @@ image and an array of SSH keys to load into it.
 do that for you.
 
 ```python
-server, _ = client.servers().get(1)
+server = client.servers().get(1)
 root_password, enable_action = server.enable_rescue_mode(rescue_type=RESCUE_TYPE_LINUX32, ssh_keys=["my-ssh-key"])
 
 enable_action.wait_until_status_is(ACTION_STATUS_SUCCESS)
@@ -244,7 +244,7 @@ or the condition matches.
 This is useful when you want to ensure your server is of a particular state before performing any actions on it.
 
 ```python
-server, _ = client.servers().get(1)
+server = client.servers().get(1)
 
 try:
     server.wait_until_status_is(SERVER_STATUS_OFF, attempts=50, wait_seconds=10)
