@@ -152,7 +152,7 @@ A number of standard exceptions can be thrown from the methods that interact wit
 * `HetznerInternalServerErrorException` - raised when the API returns a 500 status code.
 * `HetznerActionException` - raised when an action on something yields an error in the JSON response.
 
-* ### Servers
+### Servers
 
 The servers top level action is accessible through the `client.servers()` method. You must use one of the methods in
 the object returned by this top level action in order to modify the state of individual servers.
@@ -201,9 +201,9 @@ are optional, some aren't).
 
 ```python
 server_a, _ = client.servers().create(name="My required server name", # REQUIRED
-    server_type=hetznercloud.SERVER_TYPE_1CPU_2GB, # REQUIRED
-    image=hetznercloud.IMAGE_UBUNTU_1604, # REQUIRED
-    datacenter=hetznercloud.DATACENTER_FALKENSTEIN_1,
+    server_type=SERVER_TYPE_1CPU_2GB, # REQUIRED
+    image=IMAGE_UBUNTU_1604, # REQUIRED
+    datacenter=DATACENTER_FALKENSTEIN_1,
     start_after_create=True,
     ssh_keys=["my-ssh-key-1", "my-ssh-key-2"],
     user_data="rm -rf a-file")
