@@ -53,9 +53,11 @@ class HetznerActionException(Exception):
     HetznerActionException is an exception that is raised whenever an action of something fails.
     """
 
-    def __init__(self, error_code):
+    def __init__(self, error_code=None):
         if error_code is not None:
             super().__init__("Failed to perform the requested action: %s" % error_code)
+        else:
+            super().__init__("Failed to perform the requested action.")
 
 
 class HetznerWaitAttemptsExceededException(Exception):

@@ -14,6 +14,7 @@ A Python SDK for the new (and wonderful) Hetzner cloud service.
             * [Server types](#server-types)
             * [Images](#image-types)
             * [Datacentres](#datacentre-constants)
+            * [Backup windows](#backup-windows)
     * [Servers](#servers)
         * [Top level actions](#server-top-level-actions)
             * [Get all servers](#get-all-servers)
@@ -24,6 +25,7 @@ A Python SDK for the new (and wonderful) Hetzner cloud service.
             * [Change name](#change-server-name)
             * [Delete](#delete-server)
             * [Disable rescue mode](#disable-rescue-mode)
+            * [Enable backups](#enable-server-backups)
             * [Enable rescue mode](#enable-rescue-mode)
             * [Wait for status](#wait-for-server-status)
 
@@ -130,6 +132,18 @@ Constants that represent the datacentres available to users.
 * `DATACENTER_FALKENSTEIN_1` - Falkenstein 1 DC 8
 * `DATACENTER_NUREMBERG_1` - Nuremberg 1 DC 3
 
+##### Backup windows
+
+Constants that represent backup windows. 
+
+* `BACKUP_WINDOW_10PM_2AM` - Backup window between 10PM and 2AM
+* `BACKUP_WINDOW_2AM_6AM` - Backup window between 2AM and 6AM
+* `BACKUP_WINDOW_6AM_10AM` - Backup window between 6AM and 10AM
+* `BACKUP_WINDOW_10AM_2PM` - Backup window between 10AM and 2PM
+* `BACKUP_WINDOW_2PM_6PM` - Backup window between 2PM and 6PM
+* `BACKUP_WINDOW_6PM_10PM` - Backup window between 6PM and 10PM
+
+
 #### Standard exceptions
 
 A number of standard exceptions can be thrown from the methods that interact with the Hetzner API.
@@ -138,8 +152,7 @@ A number of standard exceptions can be thrown from the methods that interact wit
 * `HetznerInternalServerErrorException` - raised when the API returns a 500 status code.
 * `HetznerActionException` - raised when an action on something yields an error in the JSON response.
 
-
-### Servers
+* ### Servers
 
 The servers top level action is accessible through the `client.servers()` method. You must use one of the methods in
 the object returned by this top level action in order to modify the state of individual servers.
@@ -248,6 +261,18 @@ disable_action = server.disable_rescue_mode()
 
 disable_action.wait_until_status_is(ACTION_STATUS_SUCCESS)
 ```
+
+#### Enable server backups
+
+To enable server backups, simply call the `enable_backups()` method on the server object with your chosen backup window.
+
+```python
+server = client.servers().get(1)
+action = server.enable_backups(BACKUP_WINDOW_2AM_6AM)
+```
+
+This method throws a `HetznerActionException` if the backup window is not one of the valid choices (see:
+https://docs.hetzner.cloud/#resources-server-actions-post-11).
 
 #### Enable rescue mode
 

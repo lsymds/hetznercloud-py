@@ -1,18 +1,19 @@
-from hetznercloud import SERVER_STATUS_OFF, ACTION_STATUS_SUCCESS, SERVER_STATUS_RUNNING, HetznerActionException
+from hetznercloud import SERVER_STATUS_OFF, ACTION_STATUS_SUCCESS, SERVER_STATUS_RUNNING, \
+    BACKUP_WINDOW_10PM_2AM, HetznerActionException
 from tests.base import BaseHetznerTest
 
 
 class TestServers(BaseHetznerTest):
 
     def test_all_servers_can_be_retrieved(self):
-        server, action = self.servers.create("test-servers-can-be-retrieved", "cx11", "ubuntu-16.04")
+        self.servers.create("test-servers-can-be-retrieved", "cx11", "ubuntu-16.04")
 
         all_servers = list(self.servers.get_all())
         self.assertIsNotNone(all_servers)
         self.assertIsNot(0, len(all_servers))
 
     def test_servers_can_be_retrieved_by_name(self):
-        server, _ = self.servers.create("test-servers-can-be-retrieved-by-name", "cx11", "ubuntu-16.04")
+        self.servers.create("test-servers-can-be-retrieved-by-name", "cx11", "ubuntu-16.04")
 
         filtered_servers = list(self.servers.get_all("test-servers-can-be-retrieved-by-name"))
         self.assertIsNotNone(filtered_servers)
@@ -62,3 +63,21 @@ class TestServers(BaseHetznerTest):
 
         renamed_server = self.servers.get(created_server.id)
         self.assertEqual(renamed_server.name, "renamed-server")
+
+    def test_invalid_backup_window_results_in_an_exception_being_thrown(self):
+        created_server, _ = self.servers.create("test-backup-window-errors", "cx11", "ubuntu-16.04")
+        created_server.wait_until_status_is(SERVER_STATUS_RUNNING)
+
+        try:
+            created_server.enable_backups("02-03")
+            self.fail()
+        except HetznerActionException:
+            pass
+
+    def test_can_enable_backups_with_a_valid_backup_window(self):
+        created_server, _ = self.servers.create("test-backup-window-can-be-enabled", "cx11", "ubuntu-16.04")
+        created_server.wait_until_status_is(SERVER_STATUS_RUNNING)
+
+        created_server.enable_backups(BACKUP_WINDOW_10PM_2AM)
+
+        self.assertEquals(created_server.backup_window, BACKUP_WINDOW_10PM_2AM)

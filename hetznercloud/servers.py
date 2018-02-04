@@ -1,10 +1,10 @@
 import time
 
 from .actions import HetznerCloudAction
+from .constants import RESCUE_TYPE_LINUX, RESCUE_TYPE_FREEBSD, BACKUP_WINDOW_2AM_6AM
 from .exceptions import HetznerServerNotFoundException, HetznerInvalidArgumentException, HetznerActionException, \
     HetznerWaitAttemptsExceededException
 from .shared import _get_results
-from .constants import RESCUE_TYPE_LINUX, RESCUE_TYPE_FREEBSD
 
 
 def _get_server_json(config, server_id):
@@ -41,6 +41,7 @@ class HetznerCloudServersAction(object):
     def create(self, name, server_type, image, datacenter=None, start_after_create=True, ssh_keys=[], user_data=None):
         """
         Creates a new server in the Hetzner Cloud.
+
         :param name: The name of the server.
         :param server_type: The size of the server (i.e. VPS-1, VPS-2).
         :param datacenter: The datacenter to create the server in.
@@ -140,10 +141,7 @@ class HetznerCloudServer(object):
         if not new_name:
             raise HetznerInvalidArgumentException("new_name")
 
-        body = {
-            "name": new_name
-        }
-
+        body = { "name": new_name }
         status_code, result = _get_results(self._config, "servers/%s" % self.id, method="PUT", body=body)
         if status_code != 200:
             raise HetznerActionException()
@@ -176,6 +174,23 @@ class HetznerCloudServer(object):
 
         return HetznerCloudAction._load_from_json(self._config, result["action"])
 
+    def enable_backups(self, backup_window=BACKUP_WINDOW_2AM_6AM):
+        """
+        Enables backups for the current server.
+
+        :param backup_window: The backup window defined in the following format: HH-HH (i.e. 02-04).
+        :return: The action related to the enabling of the backups for the current server.
+        """
+        body = { "backup_window": backup_window }
+        status_code, result = _get_results(self._config, "servers/%s/actions/enable_backup" % self.id, method="POST",
+                                           body=body)
+        if status_code != 201:
+            raise HetznerActionException("Invalid backup window choice" if status_code == 422 else None)
+
+        self.backup_window = backup_window
+
+        return HetznerCloudAction._load_from_json(self._config, result["action"])
+
     def enable_rescue_mode(self, rescue_type=RESCUE_TYPE_LINUX, ssh_keys=[]):
         """
         Enables rescue mode for the current server.
@@ -192,10 +207,7 @@ class HetznerCloudServer(object):
         :return: A tuple containing the root SSH password to access the recovery mode and the action to track the
                  progress of the request.
         """
-        body = {
-            "type": rescue_type
-        }
-
+        body = { "type": rescue_type }
         if ssh_keys and len(ssh_keys > 0) and rescue_type != RESCUE_TYPE_FREEBSD:
             body["ssh_keys"] = ssh_keys
 
@@ -207,6 +219,9 @@ class HetznerCloudServer(object):
         self.rescue_enabled = True
 
         return result["root_password"], HetznerCloudAction._load_from_json(self._config, result["action"])
+
+    def image(self, description=None, image_type="snapshot"):
+        pass
 
     def power_on(self):
         pass
@@ -224,9 +239,6 @@ class HetznerCloudServer(object):
         pass
 
     def reset_root_password(self):
-        pass
-
-    def image(self, description=None, image_type="snapshot"):
         pass
 
     def wait_until_status_is(self, status, attempts=20, wait_seconds=1):
