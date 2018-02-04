@@ -21,6 +21,7 @@ A Python SDK for the new (and wonderful) Hetzner cloud service.
             * [Get server by id](#get-server-by-id)
             * [Create server](#create-server)
         * [Modifier actions (applies to a specific server)](#server-modifier-actions)
+            * [Change name](#change-server-name)
             * [Delete](#delete-server)
             * [Disable rescue mode](#disable-rescue-mode)
             * [Enable rescue mode](#enable-rescue-mode)
@@ -201,12 +202,26 @@ print(server_a.id)
 This method throws a `HetznerInvalidArgumentException` if the required parameters detailed above are not specified with
 valid values.
 
-This method throws a `HetznerActionException` if an error is returned whilst creating the server.
-
 ### Server modifier actions
 
 Once you have an instance of the server (retrieved by using one of the "Top level actions" above), you are able to
 perform different modifier actions on them.
+
+#### Change server name
+
+To change the server name, call the `change_name()` method on the `HetznerCloudServer` object, specifying a valid name
+as the first and only parameter.
+
+*NOTE:* This method does not return an action, so it is assumed that the update is processed immediately. You can verify
+this assumption by renaming the server, immediately retrieving it by its id and checking the name of the retrieved
+server is what you renamed it to. 
+
+```python
+server = client.servers().get(1)
+server.change_name("my-new-server-name")
+```
+
+This method throws a `HetznerInvalidParameterException` if you pass in an invalid `new_name` value.
 
 #### Delete server
 
@@ -219,9 +234,6 @@ action = server.delete()
 # Wait until the delete action has completed.
 action.wait_until_status_is(ACTION_STATUS_SUCCESS)
 ```
-
-This method throws a `Hetzner]ActionException` if the status code returned from the API is not 200 or if there
-is an error present in the response.
 
 #### Disable rescue mode
 

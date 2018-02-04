@@ -132,11 +132,29 @@ class HetznerCloudServer(object):
         self.root_password = ""
 
     def change_name(self, new_name):
-        pass
+        """
+        Changes the name of the server to a new, DNS compliant name.
+
+        :param new_name: The string that the server should be renamed to. NOTE: This value should be DNS compliant.
+        """
+        if not new_name:
+            raise HetznerInvalidArgumentException("new_name")
+
+        body = {
+            "name": new_name
+        }
+
+        status_code, result = _get_results(self._config, "servers/%s" % self.id, method="PUT", body=body)
+        if status_code != 200:
+            raise HetznerActionException()
+
+        self.name = new_name
 
     def delete(self):
         """
         Deletes the server, making it immediately unavailable for any further use.
+
+        :return: The action related to the deletion of the server.
         """
         status_code, result = _get_results(self._config, "servers/%s" % self.id, method="DELETE")
         if status_code != 200:
@@ -147,6 +165,7 @@ class HetznerCloudServer(object):
     def disable_rescue_mode(self):
         """
         Disables rescue mode for the current server.
+
         :return: The action related to the disabling of rescue mode for the current server.
         """
         status_code, result = _get_results(self._config, "servers/%s/actions/disable_rescue" % self.id, method="POST")

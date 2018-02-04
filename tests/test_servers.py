@@ -52,3 +52,13 @@ class TestServers(BaseHetznerTest):
 
         action = created_server.disable_rescue_mode()
         action.wait_until_status_is(ACTION_STATUS_SUCCESS)
+
+    def test_can_rename_a_server(self):
+        created_server, _ = self.servers.create("test-server-rename", "cx11", "ubuntu-16.04")
+        created_server.wait_until_status_is(SERVER_STATUS_RUNNING)
+
+        created_server.change_name("renamed-server")
+        self.assertEqual(created_server.name, "renamed-server")
+
+        renamed_server = self.servers.get(created_server.id)
+        self.assertEqual(renamed_server.name, "renamed-server")

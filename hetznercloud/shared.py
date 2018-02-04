@@ -16,6 +16,8 @@ def _get_results(config, endpoint, url_params=None, body=None, method="GET"):
         request = requests.post(api, data=json.dumps(body), headers=headers, params=url_params)
     elif method == "DELETE":
         request = requests.delete(api, headers=headers)
+    elif method == "PUT":
+        request = requests.put(api, headers=headers, data=json.dumps(body))
 
     if request.status_code == 401 or request.status_code == 403:
         raise HetznerAuthenticationException()
