@@ -1,4 +1,4 @@
-from hetznercloud import SERVER_STATUS_OFF, ACTION_STATUS_SUCCESS, SERVER_STATUS_RUNNING
+from hetznercloud import SERVER_STATUS_OFF, ACTION_STATUS_SUCCESS, SERVER_STATUS_RUNNING, HetznerActionException
 from tests.base import BaseHetznerTest
 
 
@@ -36,10 +36,19 @@ class TestServers(BaseHetznerTest):
         created_server.wait_until_status_is(SERVER_STATUS_OFF)
 
     def test_rescue_mode_can_be_added_to_a_server(self):
-        created_server, _ = self.servers.create("test-rescue-mode-can-be-added-to-a-server", "cx11", "ubuntu-16.04")
+        created_server, _ = self.servers.create("test-rescue-mode-can-be-added", "cx11", "ubuntu-16.04")
         created_server.wait_until_status_is(SERVER_STATUS_RUNNING)
 
         root_password, action = created_server.enable_rescue_mode()
         self.assertIsNotNone(root_password)
         action.wait_until_status_is(ACTION_STATUS_SUCCESS)
 
+    def test_rescue_mode_can_be_disabled_on_a_server(self):
+        created_server, _ = self.servers.create("test-rescue-mode-can-be-removed", "cx11", "ubuntu-16.04")
+        created_server.wait_until_status_is(SERVER_STATUS_RUNNING)
+
+        _, action = created_server.enable_rescue_mode()
+        action.wait_until_status_is(ACTION_STATUS_SUCCESS)
+
+        action = created_server.disable_rescue_mode()
+        action.wait_until_status_is(ACTION_STATUS_SUCCESS)

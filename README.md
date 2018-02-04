@@ -135,6 +135,7 @@ A number of standard exceptions can be thrown from the methods that interact wit
 
 * `HetznerAuthenticationException` - raised when the API returns a 401 Not Authorized or 403 Forbidden status code.
 * `HetznerInternalServerErrorException` - raised when the API returns a 500 status code.
+* `HetznerActionException` - raised when an action on something yields an error in the JSON response.
 
 
 ### Servers
@@ -200,7 +201,7 @@ print(server_a.id)
 This method throws a `HetznerInvalidArgumentException` if the required parameters detailed above are not specified with
 valid values.
 
-This method throws a `HetznerServerActionException` if an error is returned whilst creating the server.
+This method throws a `HetznerActionException` if an error is returned whilst creating the server.
 
 ### Server modifier actions
 
@@ -219,10 +220,22 @@ action = server.delete()
 action.wait_until_status_is(ACTION_STATUS_SUCCESS)
 ```
 
-This method throws a `HetznerServerActionException` if the status code returned from the API is not 200 or if there
+This method throws a `Hetzner]ActionException` if the status code returned from the API is not 200 or if there
 is an error present in the response.
 
 #### Disable rescue mode
+
+To disable rescue mode on the server, simply call the `disable_rescue_mode()` on the server object.
+
+*NOTE*: Although the API documentation says an error will be returned if rescue mode is already disabled, we have found
+this is not the case.
+
+```python
+server = client.servers().get(1)
+disable_action = server.disable_rescue_mode()
+
+disable_action.wait_until_status_is(ACTION_STATUS_SUCCESS)
+```
 
 #### Enable rescue mode
 

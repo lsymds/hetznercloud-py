@@ -1,7 +1,7 @@
 import time
 
 from .actions import HetznerCloudAction
-from .exceptions import HetznerServerNotFoundException, HetznerInvalidArgumentException, HetznerServerActionException, \
+from .exceptions import HetznerServerNotFoundException, HetznerInvalidArgumentException, HetznerActionException, \
     HetznerWaitAttemptsExceededException
 from .shared import _get_results
 from .constants import RESCUE_TYPE_LINUX, RESCUE_TYPE_FREEBSD
@@ -38,34 +38,6 @@ class HetznerCloudServersAction(object):
         """
         self._config = config
 
-    def get_all(self, name=None):
-        """
-        Retrieves all of the servers associated with the API key's project, but also allows you to filter by name.
-        Leaving the "name" parameter as None (or empty) will result in all servers associated with the API key's project
-        being brought back.
-
-        Note: Wildcards are NOT currently supported (by this SDK or the API).
-
-        :param name: The name to filter the servers by.
-        :return: An array of server objects.
-        :rtype: HetznerCloudServer[]
-        """
-        status_code, results = _get_results(self._config, "servers", {"name": name} if name is not None else None)
-        for result in results["servers"]:
-            yield HetznerCloudServer._load_from_json(self._config, result)
-
-    def get(self, server_id):
-        """
-        Gets a server by its defined id.
-
-        :param server_id: The server's id.
-        :return: A server object if the server exists, or a HetznerServerNotFoundException.
-        """
-        if not isinstance(server_id, int) or server_id == 0:
-            raise HetznerServerNotFoundException()
-
-        return HetznerCloudServer._load_from_json(self._config, _get_server_json(self._config, server_id))
-
     def create(self, name, server_type, image, datacenter=None, start_after_create=True, ssh_keys=[], user_data=None):
         """
         Creates a new server in the Hetzner Cloud.
@@ -100,10 +72,38 @@ class HetznerCloudServersAction(object):
 
         _, result = _get_results(self._config, "servers", body=create_params, method="POST")
         if result is None or ("error" in result and result["error"] is not None):
-            raise HetznerServerActionException(result["error"] if result is not None else None)
+            raise HetznerActionException(result["error"] if result is not None else None)
 
         return HetznerCloudServer._load_from_json(self._config, result["server"], result["root_password"]), \
                HetznerCloudAction._load_from_json(self._config, result["action"])
+
+    def get(self, server_id):
+        """
+        Gets a server by its defined id.
+
+        :param server_id: The server's id.
+        :return: A server object if the server exists, or a HetznerServerNotFoundException.
+        """
+        if not isinstance(server_id, int) or server_id == 0:
+            raise HetznerServerNotFoundException()
+
+        return HetznerCloudServer._load_from_json(self._config, _get_server_json(self._config, server_id))
+
+    def get_all(self, name=None):
+        """
+        Retrieves all of the servers associated with the API key's project, but also allows you to filter by name.
+        Leaving the "name" parameter as None (or empty) will result in all servers associated with the API key's project
+        being brought back.
+
+        Note: Wildcards are NOT currently supported (by this SDK or the API).
+
+        :param name: The name to filter the servers by.
+        :return: An array of server objects.
+        :rtype: HetznerCloudServer[]
+        """
+        status_code, results = _get_results(self._config, "servers", {"name": name} if name is not None else None)
+        for result in results["servers"]:
+            yield HetznerCloudServer._load_from_json(self._config, result)
 
 
 class HetznerCloudServer(object):
@@ -131,21 +131,6 @@ class HetznerCloudServer(object):
         self.included_traffic = 0
         self.root_password = ""
 
-    def power_on(self):
-        pass
-
-    def power_off(self):
-        pass
-
-    def soft_reboot(self):
-        pass
-
-    def reset(self):
-        pass
-
-    def shutdown(self):
-        pass
-
     def change_name(self, new_name):
         pass
 
@@ -154,13 +139,23 @@ class HetznerCloudServer(object):
         Deletes the server, making it immediately unavailable for any further use.
         """
         status_code, result = _get_results(self._config, "servers/%s" % self.id, method="DELETE")
-        if status_code != 200 or "error" in result:
-            raise HetznerServerActionException(result["error"] if "error" in result else None)
+        if status_code != 200:
+            raise HetznerActionException()
 
         return HetznerCloudAction._load_from_json(self._config, result["action"])
 
-    def reset_root_password(self):
-        pass
+    def disable_rescue_mode(self):
+        """
+        Disables rescue mode for the current server.
+        :return: The action related to the disabling of rescue mode for the current server.
+        """
+        status_code, result = _get_results(self._config, "servers/%s/actions/disable_rescue" % self.id, method="POST")
+        if status_code != 201:
+            raise HetznerActionException()
+
+        self.rescue_enabled = False
+
+        return HetznerCloudAction._load_from_json(self._config, result["action"])
 
     def enable_rescue_mode(self, rescue_type=RESCUE_TYPE_LINUX, ssh_keys=[]):
         """
@@ -187,12 +182,29 @@ class HetznerCloudServer(object):
 
         status_code, result = _get_results(self._config, "servers/%s/actions/enable_rescue" % self.id, method="POST",
                                            body=body)
-        if status_code != 201 or "error" in result:
-            raise HetznerServerActionException(result["error"] if "error" in result else None)
+        if status_code != 201:
+            raise HetznerActionException()
+
+        self.rescue_enabled = True
 
         return result["root_password"], HetznerCloudAction._load_from_json(self._config, result["action"])
 
-    def disable_rescue_mode(self):
+    def power_on(self):
+        pass
+
+    def power_off(self):
+        pass
+
+    def soft_reboot(self):
+        pass
+
+    def reset(self):
+        pass
+
+    def shutdown(self):
+        pass
+
+    def reset_root_password(self):
         pass
 
     def image(self, description=None, image_type="snapshot"):
