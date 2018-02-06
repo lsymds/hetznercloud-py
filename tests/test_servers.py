@@ -81,3 +81,18 @@ class TestServers(BaseHetznerTest):
         created_server.enable_backups(BACKUP_WINDOW_10PM_2AM)
 
         self.assertEquals(created_server.backup_window, BACKUP_WINDOW_10PM_2AM)
+
+    def test_can_attach_iso_to_a_server(self):
+        created_server, _ = self.servers.create("test-backup-window-can-be-enabled", "cx11", "ubuntu-16.04")
+        created_server.wait_until_status_is(SERVER_STATUS_RUNNING)
+
+        attach_iso_action = created_server.attach_iso("virtio-win-0.1.141.iso")
+        attach_iso_action.wait_until_status_is(ACTION_STATUS_SUCCESS)
+
+    def test_can_change_reverse_dns_of_a_server(self):
+        created_server, _ = self.servers.create("test-backup-window-can-be-enabled", "cx11", "ubuntu-16.04")
+        created_server.wait_until_status_is(SERVER_STATUS_RUNNING)
+
+        created_server.change_reverse_dns_entry(created_server.public_net_ipv4, "google.com")
+
+

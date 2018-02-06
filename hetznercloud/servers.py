@@ -54,8 +54,8 @@ class HetznerCloudServersAction(object):
         if not name or not server_type or not image:
             raise HetznerInvalidArgumentException("name" if not name
                                                   else "server_type" if not server_type
-                                                  else "image" if not image
-                                                  else "")
+            else "image" if not image
+            else "")
 
         create_params = {
             "name": name,
@@ -133,7 +133,23 @@ class HetznerCloudServer(object):
         self.root_password = ""
 
     def attach_iso(self, iso):
-        pass
+        """
+        Attaches an ISO that has been uploaded to Hetzner Cloud to the current server.
+
+        NOTE: You will need to reboot your server for the ISO to be booted into.
+
+        :param iso: The ISO that should be mounted to the server.
+        :return: The action related to the mounting of the ISO.
+        """
+        if not iso:
+            raise HetznerInvalidArgumentException("iso")
+
+        status_code, result = _get_results(self._config, "servers/%s/actions/attach_iso" % self.id, method="POST",
+                                           body={"iso": iso})
+        if status_code != 201:
+            raise HetznerActionException()
+
+        return HetznerCloudAction._load_from_json(self._config, result["action"])
 
     def change_name(self, new_name):
         """
@@ -144,15 +160,31 @@ class HetznerCloudServer(object):
         if not new_name:
             raise HetznerInvalidArgumentException("new_name")
 
-        body = { "name": new_name }
+        body = {"name": new_name}
         status_code, result = _get_results(self._config, "servers/%s" % self.id, method="PUT", body=body)
         if status_code != 200:
             raise HetznerActionException()
 
         self.name = new_name
 
-    def change_reverse_dns_entry(self):
-        pass
+    def change_reverse_dns_entry(self, ip, dns_pointer=None):
+        """
+        Changes the reverse DNS entry associated with the server to that of the parameters passed into this method.
+
+        :param ip: The IP address for the reverse DNS entry.
+        :param dns_pointer: The optional DNS name. If this is left as "None", then the DNS entry will be reset back to
+        its original value when the server was first created.
+        :return: The action related to the change of the DNS entry.
+        """
+        if not ip:
+            raise HetznerInvalidArgumentException("ip")
+
+        status_code, result = _get_results(self._config, "servers/%s/actions/change_dns_ptr" % self.id, method="POST",
+                                           body={"ip": ip, "dns_ptr": dns_pointer})
+        if status_code != 201:
+            raise HetznerActionException()
+
+        return HetznerCloudAction._load_from_json(self._config, result["action"])
 
     def change_type(self):
         pass
@@ -193,9 +225,8 @@ class HetznerCloudServer(object):
         :param backup_window: The backup window defined in the following format: HH-HH (i.e. 02-04).
         :return: The action related to the enabling of the backups for the current server.
         """
-        body = { "backup_window": backup_window }
         status_code, result = _get_results(self._config, "servers/%s/actions/enable_backup" % self.id, method="POST",
-                                           body=body)
+                                           body={"backup_window": backup_window})
         if status_code != 201:
             raise HetznerActionException("Invalid backup window choice" if status_code == 422 else None)
 
@@ -219,7 +250,7 @@ class HetznerCloudServer(object):
         :return: A tuple containing the root SSH password to access the recovery mode and the action to track the
                  progress of the request.
         """
-        body = { "type": rescue_type }
+        body = {"type": rescue_type}
         if ssh_keys and len(ssh_keys > 0) and rescue_type != RESCUE_TYPE_FREEBSD:
             body["ssh_keys"] = ssh_keys
 
@@ -301,4 +332,3 @@ class HetznerCloudServer(object):
         cloud_server.root_password = root_password
 
         return cloud_server
-

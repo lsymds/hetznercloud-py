@@ -24,6 +24,8 @@ A Python SDK for the new (and wonderful) Hetzner cloud service.
             * [Get server by id](#get-server-by-id)
             * [Create server](#create-server)
         * [Modifier actions (applies to a specific server)](#server-modifier-actions)
+            * [Attach an ISO](#attach-iso)
+            * [Change reverse DNS](#change-reverse-dns)
             * [Change name](#change-server-name)
             * [Delete](#delete-server)
             * [Disable rescue mode](#disable-rescue-mode)
@@ -221,6 +223,35 @@ valid values.
 
 Once you have an instance of the server (retrieved by using one of the "Top level actions" above), you are able to
 perform different modifier actions on them.
+
+#### Attach ISO
+
+To attach an ISO to the server, call the `attach_iso()` method on the `HetznerCloudServer` object, specifying either the
+name or the ID of the ISO you wish to attach to the server (these can be retrieved by using the `isos().get_all()`
+method on the client).
+
+*NOTE: Constants will **not** be provided for the ISOs, as they are too dynamic and likely to change.*
+
+```python
+server = client.servers().get(1)
+iso_action = server.attach_iso("virtio-win-0.1.141.iso")
+iso_action.wait_until_status_is(ACTION_STATUS_SUCCESS)
+```
+
+This method throws a `HetznerInvalidParameterException` if you pass in an invalid `iso` value. 
+
+#### Change reverse DNS
+
+To change the reverse DNS record associated with the server, call the `change_reverse_dns_entry()` method on the
+`HetznerCloudServer` object, specifying the IP address you wish to add a record for and the reverse DNS record.
+
+*NOTE: If you leave the `dns_pointer` parameter as `None`, the reverse DNS record will be reverted back to what Hetzner
+set it as when they created your server.*
+
+```python
+server = client.servers().get(1)
+action = server.change_reverse_dns_entry("192.168.1.1", "www.google.com")
+```
 
 #### Change server name
 
