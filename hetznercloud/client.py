@@ -64,6 +64,30 @@ class HetznerCloudClient(object):
 
         self.configuration = configuration
 
+    def actions(self):
+        pass
+
+    def datacentres(self):
+        pass
+
+    def floating_ips(self):
+        pass
+
+    def images(self):
+        pass
+
+    def isos(self):
+        pass
+
+    def locations(self):
+        pass
+
+    def metrics(self):
+        pass
+
+    def server_types(self):
+        pass
+
     def servers(self):
         """
         Returns an action object that contains all functionality relevant to servers within the Hetzner Cloud.
@@ -71,3 +95,6 @@ class HetznerCloudClient(object):
         :return: An action object related to servers
         """
         return HetznerCloudServersAction(self.configuration)
+
+    def ssh_keys(self):
+        pass

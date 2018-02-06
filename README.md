@@ -202,7 +202,7 @@ To create a server, you can call the `create` top level action method. This meth
 are optional, some aren't).
 
 ```python
-server_a, _ = client.servers().create(name="My required server name", # REQUIRED
+server_a, root_password, create_action = client.servers().create(name="My required server name", # REQUIRED
     server_type=SERVER_TYPE_1CPU_2GB, # REQUIRED
     image=IMAGE_UBUNTU_1604, # REQUIRED
     datacenter=DATACENTER_FALKENSTEIN_1,
@@ -211,7 +211,7 @@ server_a, _ = client.servers().create(name="My required server name", # REQUIRED
     user_data="rm -rf a-file")
 server_a.wait_until_status_is(SERVER_STATUS_RUNNING) 
     
-print(server_a.id)
+print("Your server's root password is: %s" % root_password)
 ```
 
 This method throws a `HetznerInvalidArgumentException` if the required parameters detailed above are not specified with

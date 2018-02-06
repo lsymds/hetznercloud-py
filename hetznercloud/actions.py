@@ -9,6 +9,8 @@ def _get_action_json(config, id):
     status_code, json = _get_results(config, "actions/%s" % id)
     return json["action"]
 
+class HetznerCloudActionsAction(object):
+    pass
 
 class HetznerCloudAction(object):
     """

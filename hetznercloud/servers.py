@@ -132,6 +132,9 @@ class HetznerCloudServer(object):
         self.included_traffic = 0
         self.root_password = ""
 
+    def attach_iso(self, iso):
+        pass
+
     def change_name(self, new_name):
         """
         Changes the name of the server to a new, DNS compliant name.
@@ -148,6 +151,12 @@ class HetznerCloudServer(object):
 
         self.name = new_name
 
+    def change_reverse_dns_entry(self):
+        pass
+
+    def change_type(self):
+        pass
+
     def delete(self):
         """
         Deletes the server, making it immediately unavailable for any further use.
@@ -159,6 +168,9 @@ class HetznerCloudServer(object):
             raise HetznerActionException()
 
         return HetznerCloudAction._load_from_json(self._config, result["action"])
+
+    def detach_iso(self):
+        pass
 
     def disable_rescue_mode(self):
         """
@@ -232,13 +244,16 @@ class HetznerCloudServer(object):
     def soft_reboot(self):
         pass
 
+    def rebuild_from_image(self):
+        pass
+
     def reset(self):
         pass
 
-    def shutdown(self):
+    def reset_root_password(self):
         pass
 
-    def reset_root_password(self):
+    def shutdown(self):
         pass
 
     def wait_until_status_is(self, status, attempts=20, wait_seconds=1):
