@@ -27,7 +27,9 @@ A Python SDK for the new (and wonderful) Hetzner cloud service.
             * [Attach an ISO](#attach-iso)
             * [Change reverse DNS](#change-reverse-dns)
             * [Change name](#change-server-name)
+            * [Change type](#change-server-type)
             * [Delete](#delete-server)
+            * [Detach ISO](#detach-iso)
             * [Disable rescue mode](#disable-rescue-mode)
             * [Enable backups](#enable-server-backups)
             * [Enable rescue mode](#enable-rescue-mode)
@@ -154,7 +156,10 @@ A number of standard exceptions can be thrown from the methods that interact wit
 
 * `HetznerAuthenticationException` - raised when the API returns a 401 Not Authorized or 403 Forbidden status code.
 * `HetznerInternalServerErrorException` - raised when the API returns a 500 status code.
-* `HetznerActionException` - raised when an action on something yields an error in the JSON response.
+* `HetznerActionException` - raised when an action on something yields an error in the JSON response or the status code
+is not what was expected.
+* `HetznerInvalidArgumentException` - raised when a required argument of the method is not specified correctly. The
+exception will detail the failing parameter.
 
 ### Servers
 
@@ -204,7 +209,7 @@ To create a server, you can call the `create` top level action method. This meth
 are optional, some aren't).
 
 ```python
-server_a, root_password, create_action = client.servers().create(name="My required server name", # REQUIRED
+server_a, create_action = client.servers().create(name="My required server name", # REQUIRED
     server_type=SERVER_TYPE_1CPU_2GB, # REQUIRED
     image=IMAGE_UBUNTU_1604, # REQUIRED
     datacenter=DATACENTER_FALKENSTEIN_1,
@@ -212,12 +217,7 @@ server_a, root_password, create_action = client.servers().create(name="My requir
     ssh_keys=["my-ssh-key-1", "my-ssh-key-2"],
     user_data="rm -rf a-file")
 server_a.wait_until_status_is(SERVER_STATUS_RUNNING) 
-    
-print("Your server's root password is: %s" % root_password)
 ```
-
-This method throws a `HetznerInvalidArgumentException` if the required parameters detailed above are not specified with
-valid values.
 
 ### Server modifier actions
 
@@ -238,8 +238,6 @@ iso_action = server.attach_iso("virtio-win-0.1.141.iso")
 iso_action.wait_until_status_is(ACTION_STATUS_SUCCESS)
 ```
 
-This method throws a `HetznerInvalidParameterException` if you pass in an invalid `iso` value. 
-
 #### Change reverse DNS
 
 To change the reverse DNS record associated with the server, call the `change_reverse_dns_entry()` method on the
@@ -258,16 +256,32 @@ action = server.change_reverse_dns_entry("192.168.1.1", "www.google.com")
 To change the server name, call the `change_name()` method on the `HetznerCloudServer` object, specifying a valid name
 as the first and only parameter.
 
-*NOTE:* This method does not return an action, so it is assumed that the update is processed immediately. You can verify
+*NOTE: This method does not return an action, so it is assumed that the update is processed immediately. You can verify
 this assumption by renaming the server, immediately retrieving it by its id and checking the name of the retrieved
-server is what you renamed it to. 
+server is what you renamed it to.*
 
 ```python
 server = client.servers().get(1)
 server.change_name("my-new-server-name")
 ```
 
-This method throws a `HetznerInvalidParameterException` if you pass in an invalid `new_name` value.
+#### Change server type
+
+To change the server type (i.e. from a small, to a large instance), call the `change_type()` method on the
+`HetznerCloudServer` object, specifying the new server type as the first parameter and whether to resize the
+disk as the second parameter.
+
+*NOTE: Your server needs to be powered off in order for this to work.*
+
+*NOTE: If you wish to downgrade the server type in the future, make sure you set the `upgrade_disk` parameter to False.
+Not doing this will result in an error being thrown should you try to downgrade in the future.*
+
+```python
+server = client.servers().get(1)
+action = server.change_type(SERVER_TYPE_2CPU_4GB, False)
+
+action.wait_until_status_is(ACTION_STATUS_SUCCESS)
+```
 
 #### Delete server
 
@@ -278,6 +292,20 @@ server = client.servers().get(1)
 action = server.delete()
 
 # Wait until the delete action has completed.
+action.wait_until_status_is(ACTION_STATUS_SUCCESS)
+```
+
+#### Detach ISO
+
+To detach the ISO from the server (if there is one present), call the `detach_iso()` method on the `HetznerCloudServer`
+object. 
+
+*NOTE: Calling this method when no ISO is attached to the server will succeed and not throw an error.*
+
+```python
+server = client.servers.get(1)
+action = server.detach_iso()
+
 action.wait_until_status_is(ACTION_STATUS_SUCCESS)
 ```
 

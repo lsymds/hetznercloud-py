@@ -147,7 +147,7 @@ class HetznerCloudServer(object):
         status_code, result = _get_results(self._config, "servers/%s/actions/attach_iso" % self.id, method="POST",
                                            body={"iso": iso})
         if status_code != 201:
-            raise HetznerActionException()
+            raise HetznerActionException(result)
 
         return HetznerCloudAction._load_from_json(self._config, result["action"])
 
@@ -163,7 +163,7 @@ class HetznerCloudServer(object):
         body = {"name": new_name}
         status_code, result = _get_results(self._config, "servers/%s" % self.id, method="PUT", body=body)
         if status_code != 200:
-            raise HetznerActionException()
+            raise HetznerActionException(result)
 
         self.name = new_name
 
@@ -182,12 +182,28 @@ class HetznerCloudServer(object):
         status_code, result = _get_results(self._config, "servers/%s/actions/change_dns_ptr" % self.id, method="POST",
                                            body={"ip": ip, "dns_ptr": dns_pointer})
         if status_code != 201:
-            raise HetznerActionException()
+            raise HetznerActionException(result)
 
         return HetznerCloudAction._load_from_json(self._config, result["action"])
 
-    def change_type(self):
-        pass
+    def change_type(self, new_instance_type, upgrade_disk=True):
+        """
+        Changes the type of the server (i.e. a small instance to a larger instance).
+
+        :param new_instance_type: The new instance type to scale the server to.
+        :param upgrade_disk: Whether to upgrade the disk. If false, it will be possible to downgrade the server type
+        later. If true, it will not be possible to downgrade the server.
+        :return: The action related to the change of the server type.
+        """
+        if not new_instance_type:
+            raise HetznerInvalidArgumentException("new_instance_type")
+
+        status_code, result = _get_results(self._config, "servers/%s/actions/change_type" % self.id, method="POST",
+                                           body={"server_type": new_instance_type, "upgrade_disk": upgrade_disk})
+        if status_code != 201:
+            raise HetznerActionException(result)
+
+        return HetznerCloudAction._load_from_json(self._config, result["action"])
 
     def delete(self):
         """
@@ -197,12 +213,22 @@ class HetznerCloudServer(object):
         """
         status_code, result = _get_results(self._config, "servers/%s" % self.id, method="DELETE")
         if status_code != 200:
-            raise HetznerActionException()
+            raise HetznerActionException(result)
 
         return HetznerCloudAction._load_from_json(self._config, result["action"])
 
     def detach_iso(self):
-        pass
+        """
+        Detaches a mounted ISO (if present) from the current server. If there is no ISO mounted, then the action
+        returned will have its status set immediately to true.
+
+        :return: The action related to the removal of the ISO from the server.
+        """
+        status_code, result = _get_results(self._config, "servers/%s/actions/detach_iso", method="POST")
+        if status_code != 201:
+            return HetznerActionException(result)
+
+        return HetznerCloudAction._load_from_json(self._config, result["action"])
 
     def disable_rescue_mode(self):
         """
@@ -212,7 +238,7 @@ class HetznerCloudServer(object):
         """
         status_code, result = _get_results(self._config, "servers/%s/actions/disable_rescue" % self.id, method="POST")
         if status_code != 201:
-            raise HetznerActionException()
+            raise HetznerActionException(result)
 
         self.rescue_enabled = False
 
@@ -228,7 +254,7 @@ class HetznerCloudServer(object):
         status_code, result = _get_results(self._config, "servers/%s/actions/enable_backup" % self.id, method="POST",
                                            body={"backup_window": backup_window})
         if status_code != 201:
-            raise HetznerActionException("Invalid backup window choice" if status_code == 422 else None)
+            raise HetznerActionException("Invalid backup window choice" if status_code == 422 else result)
 
         self.backup_window = backup_window
 
@@ -257,7 +283,7 @@ class HetznerCloudServer(object):
         status_code, result = _get_results(self._config, "servers/%s/actions/enable_rescue" % self.id, method="POST",
                                            body=body)
         if status_code != 201:
-            raise HetznerActionException()
+            raise HetznerActionException(result)
 
         self.rescue_enabled = True
 
