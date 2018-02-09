@@ -1,7 +1,8 @@
 import time
 
 from .actions import HetznerCloudAction
-from .constants import RESCUE_TYPE_LINUX, RESCUE_TYPE_FREEBSD, BACKUP_WINDOW_2AM_6AM
+from .constants import RESCUE_TYPE_LINUX, RESCUE_TYPE_FREEBSD, BACKUP_WINDOW_2AM_6AM, SERVER_STATUS_RUNNING, \
+    SERVER_STATUS_OFF
 from .exceptions import HetznerServerNotFoundException, HetznerInvalidArgumentException, HetznerActionException, \
     HetznerWaitAttemptsExceededException
 from .shared import _get_results
@@ -290,13 +291,52 @@ class HetznerCloudServer(object):
         return result["root_password"], HetznerCloudAction._load_from_json(self._config, result["action"])
 
     def image(self, description=None, image_type="snapshot"):
-        pass
+        """
+        Images the server in a way defined by the image_type parameter.
+
+        :param description: The description of the image.
+        :param image_type: The type of the image, possible options are: backup or snapshot.
+        :return: The image id and the action related to the creation of the image.
+        """
+        body = {"type": image_type}
+        if description is not None:
+            body["description"] = description
+
+        status_code, result = _get_results(self._config, "servers/%s/actions/create_image" % self.id, method="POST",
+                                           body=body)
+        if status_code != 201:
+            raise HetznerActionException(result)
+
+        return result["image"]["id"], HetznerCloudAction._load_from_json(self._config, result["action"])
 
     def power_on(self):
-        pass
+        """
+        Powers on a server. If the server is already running, then a successful action is returned.
+
+        :return: The action related to powering on the server.
+        """
+        status_code, result = _get_results(self._config, "servers/%s/actions/poweron" % self.id, method="POST")
+        if status_code != 201:
+            raise HetznerActionException(result)
+
+        self.status = SERVER_STATUS_RUNNING
+
+        return HetznerCloudAction._load_from_json(self._config, result["action"])
 
     def power_off(self):
-        pass
+        """
+        Powers off a server. This forcefully stops the server, and is equivelent to pulling the power cord out of the
+        plug socket. Data loss could happen by calling this method.
+
+        :return: The action related to powering off the server.
+        """
+        status_code, result = _get_results(self._config, "servers/%s/actions/poweroff" % self.id, method="POST")
+        if status_code != 201:
+            raise HetznerActionException(result)
+
+        self.status = SERVER_STATUS_OFF
+
+        return HetznerCloudAction._load_from_json(self._config, result["action"])
 
     def soft_reboot(self):
         pass

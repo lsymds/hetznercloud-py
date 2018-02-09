@@ -17,6 +17,7 @@ A Python SDK for the new (and wonderful) Hetzner cloud service.
             * [Images](#image-types)
             * [Datacentres](#datacentre-constants)
             * [Backup windows](#backup-windows)
+            * [Image types](#image-types)
     * [Servers](#servers)
         * [Top level actions](#server-top-level-actions)
             * [Get all servers](#get-all-servers)
@@ -33,6 +34,8 @@ A Python SDK for the new (and wonderful) Hetzner cloud service.
             * [Disable rescue mode](#disable-rescue-mode)
             * [Enable backups](#enable-server-backups)
             * [Enable rescue mode](#enable-rescue-mode)
+            * [Image](#image-server)
+            * [Power on](#power-on)
             * [Wait for status](#wait-for-server-status)
 
 ## State
@@ -149,6 +152,12 @@ Constants that represent backup windows.
 * `BACKUP_WINDOW_2PM_6PM` - Backup window between 2PM and 6PM
 * `BACKUP_WINDOW_6PM_10PM` - Backup window between 6PM and 10PM
 
+##### Image types
+
+Constants that represent image types.
+
+* `IMAGE_TYPE_BACKUP` - A manual backup of a server, which is then bound to the server it was created from.
+* `IMAGE_TYPE_SNAPSHOT` - A snapshot of a server that can be used to create other servers. 
 
 #### Standard exceptions
 
@@ -353,6 +362,32 @@ enable_action.wait_until_status_is(ACTION_STATUS_SUCCESS)
 
 print("Your root password for the rescue mode is %s" % root_password)
 ```
+
+#### Image server
+
+To image a server (i.e. create a backup or a snapshot), call the `image()` method on the server object. You can specify
+the description of the server and the type of image you are creating. Possible image types are as follows:
+
+* `backup` - An image that is bound to the server and deleted when the server is. **Only available when server backups
+are enabled**.
+* `snapshot` - An image created independent of the server and billed seperately.
+
+```python
+server = client.servers().get(1)
+image_id, image_action = server.image("My backup image", type=IMAGE_TYPE_BACKUP)
+
+image_action.wait_until_status_is(ACTION_STATUS_SUCCESS)
+
+print("The new backup image identifier is %s" % image_id)
+``` 
+
+#### Power on
+
+To power a server on, simply call the `power_on()` method on the server object.
+
+#### Power off
+
+To power a server off, simply call the `power_off()` method on the server object.
 
 #### Wait for server status
 

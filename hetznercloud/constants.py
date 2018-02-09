@@ -32,6 +32,9 @@ IMAGE_DEBIAN_9 = "debian-9"
 IMAGE_CENTOS_7 = "centos-7"
 IMAGE_FEDORA_27 = "fedora-27"
 
+IMAGE_TYPE_BACKUP = "backup"
+IMAGE_TYPE_SNAPSHOT = "snapshot"
+
 DATACENTER_FALKENSTEIN_1 = "fsn1-dc8"
 DATACENTER_NUREMBERG_1 = "nbg1-dc3"
 
