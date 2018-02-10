@@ -1,3 +1,4 @@
+from hetznercloud.datacenters import HetznerCloudDatacentersAction
 from .exceptions import HetznerConfigurationException
 from .servers import HetznerCloudServersAction
 
@@ -68,7 +69,12 @@ class HetznerCloudClient(object):
         pass
 
     def datacentres(self):
-        pass
+        """
+        Returns an action object that contains all functionality related to datacenters within Hetzner Cloud.
+
+        :return: An action object related to datacenters
+        """
+        return HetznerCloudDatacentersAction(self.configuration)
 
     def floating_ips(self):
         pass

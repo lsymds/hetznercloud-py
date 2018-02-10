@@ -42,6 +42,11 @@ A Python SDK for the new (and wonderful) Hetzner cloud service.
             * [Reset root password](#reset-root-password)
             * [Shutdown](#shutdown-server)
             * [Wait for status](#wait-for-server-status)
+    * [Datacenters](#datacenters)
+        * [Top level actions](#datacenter-top-level-actions)
+            * [Get all datacenters](#get-all-datacenters)
+            * [Get all datacenters by name](#get-all-datacenters-by-name)
+            * [Get by id](#get-datacenter-by-id)
 
 ## State
 
@@ -191,7 +196,7 @@ all_servers = client.servers().get_all() # gets all the servers as a generator
 all_servers_list = list(client.servers().get_all()) # gets all the servers as a list
 ```
 
-#### Get all servers by name
+##### Get all servers by name
 
 By calling the `get_all(name="my-server-name")` method (with the optional `name` parameter entered), you can bring back
 the servers that have the name entered.
@@ -201,7 +206,7 @@ all_servers = client.servers().get_all(name="foo") # gets all the servers as a g
 all_servers_list = list(client.servers().get_all(name="foo")) # gets all the servers as a list
 ```
 
-#### Get server by id
+##### Get server by id
 
 If you know the id of the server you wish to retrieve you can use this method to retrieve that specific server.
 
@@ -217,7 +222,7 @@ This method throws a `HetznerServerNotFoundException` if the following condition
 * The id passed into the method is not an integer or is not greater than 0.
 * The API returns a 404 indicating that the server could not be found.
 
-#### Create server
+##### Create server
 
 To create a server, you can call the `create` top level action method. This method accepts a number of parameters (some
 are optional, some aren't).
@@ -233,12 +238,12 @@ server_a, create_action = client.servers().create(name="My required server name"
 server_a.wait_until_status_is(SERVER_STATUS_RUNNING) 
 ```
 
-### Server modifier actions
+#### Server modifier actions
 
 Once you have an instance of the server (retrieved by using one of the "Top level actions" above), you are able to
 perform different modifier actions on them.
 
-#### Attach ISO
+##### Attach ISO
 
 To attach an ISO to the server, call the `attach_iso()` method on the `HetznerCloudServer` object, specifying either the
 name or the ID of the ISO you wish to attach to the server (these can be retrieved by using the `isos().get_all()`
@@ -252,7 +257,7 @@ iso_action = server.attach_iso("virtio-win-0.1.141.iso")
 iso_action.wait_until_status_is(ACTION_STATUS_SUCCESS)
 ```
 
-#### Change reverse DNS
+##### Change reverse DNS
 
 To change the reverse DNS record associated with the server, call the `change_reverse_dns_entry()` method on the
 `HetznerCloudServer` object, specifying the IP address you wish to add a record for and the reverse DNS record.
@@ -265,7 +270,7 @@ server = client.servers().get(1)
 action = server.change_reverse_dns_entry("192.168.1.1", "www.google.com")
 ```
 
-#### Change server name
+##### Change server name
 
 To change the server name, call the `change_name()` method on the `HetznerCloudServer` object, specifying a valid name
 as the first and only parameter.
@@ -279,7 +284,7 @@ server = client.servers().get(1)
 server.change_name("my-new-server-name")
 ```
 
-#### Change server type
+##### Change server type
 
 To change the server type (i.e. from a small, to a large instance), call the `change_type()` method on the
 `HetznerCloudServer` object, specifying the new server type as the first parameter and whether to resize the
@@ -297,7 +302,7 @@ action = server.change_type(SERVER_TYPE_2CPU_4GB, False)
 action.wait_until_status_is(ACTION_STATUS_SUCCESS)
 ```
 
-#### Delete server
+##### Delete server
 
 To delete the server, call the `delete()` method on the `HetznerCloudServer` object.
 
@@ -309,7 +314,7 @@ action = server.delete()
 action.wait_until_status_is(ACTION_STATUS_SUCCESS)
 ```
 
-#### Detach ISO
+##### Detach ISO
 
 To detach the ISO from the server (if there is one present), call the `detach_iso()` method on the `HetznerCloudServer`
 object. 
@@ -323,7 +328,7 @@ action = server.detach_iso()
 action.wait_until_status_is(ACTION_STATUS_SUCCESS)
 ```
 
-#### Disable rescue mode
+##### Disable rescue mode
 
 To disable rescue mode on the server, simply call the `disable_rescue_mode()` on the server object.
 
@@ -337,7 +342,7 @@ disable_action = server.disable_rescue_mode()
 disable_action.wait_until_status_is(ACTION_STATUS_SUCCESS)
 ```
 
-#### Enable server backups
+##### Enable server backups
 
 To enable server backups, simply call the `enable_backups()` method on the server object with your chosen backup window.
 
@@ -349,7 +354,7 @@ action = server.enable_backups(BACKUP_WINDOW_2AM_6AM)
 This method throws a `HetznerActionException` if the backup window is not one of the valid choices (see:
 https://docs.hetzner.cloud/#resources-server-actions-post-11).
 
-#### Enable rescue mode
+##### Enable rescue mode
 
 To enable rescue mode, simply call the `enable_rescue_mode()` method on the server object. You can specify a rescue
 image and an array of SSH keys to load into it.
@@ -368,7 +373,7 @@ enable_action.wait_until_status_is(ACTION_STATUS_SUCCESS)
 print("Your root password for the rescue mode is %s" % root_password)
 ```
 
-#### Image server
+##### Image server
 
 To image a server (i.e. create a backup or a snapshot), call the `image()` method on the server object. You can specify
 the description of the server and the type of image you are creating. Possible image types are as follows:
@@ -386,15 +391,15 @@ image_action.wait_until_status_is(ACTION_STATUS_SUCCESS)
 print("The new backup image identifier is %s" % image_id)
 ``` 
 
-#### Power on
+##### Power on
 
 To power a server on, simply call the `power_on()` method on the server object.
 
-#### Power off
+##### Power off
 
 To power a server off, simply call the `power_off()` method on the server object.
 
-#### Rebuild from image
+##### Rebuild from image
 
 To rebuild a server from an image, simply call the `rebuild_from_image()` method on the server object, passing in the
 image id or name you wish to overwrite the server with.
@@ -408,7 +413,7 @@ action = server.rebuild_from_image(IMAGE_UBUNTU_1604)
 action.wait_until_status_is(ACTION_STATUS_SUCCESS)
 ```
 
-#### Reset server
+##### Reset server
 
 To reset a server (equivelent to pulling the power cord and plugging it back in), simply call the `reset()` method on
 the server object.
@@ -419,7 +424,7 @@ action = server.reset()
 action.wait_until_status_is(ACTION_STATUS_SUCCESS)
 ```
 
-#### Reset root password
+##### Reset root password
 
 To reset the password of the Root account on a server, simply call the `reset_root_password()` method on the server
 object. 
@@ -431,7 +436,7 @@ root_password, reset_action = server.reset_root_password()
 print("The new root password is %s" % root_password)
 ```
 
-#### Shutdown server
+##### Shutdown server
 
 To shutdown a server gracefully, simply call the `shutdown()` method on the server object.
 
@@ -442,7 +447,7 @@ server = client.servers().get(1)
 server.shutdown()
 ```
 
-#### Wait for server status
+##### Wait for server status
 
 You can wait for a server to have a particular status by calling the `wait_until_status_is(desired_status)` method on
 the server object.
@@ -464,3 +469,46 @@ except HetznerWaitAttemptsExceededException:
 
 This method throws a `HetznerWaitAttemptsExceededException` should the amount of attempts be exceeded with the condition
 still being unmet.
+
+### Datacenters
+
+#### Top level actions
+
+The datacenter top level action can be retrieved by calling the `datacenters()` method on the `HetznerCloudClient`
+instance.
+
+##### Get all datacenters
+
+To retrieve all of the datacenters available on the Hetzner Cloud service, simply call the `get_all()` method, passing
+in no parameters.
+
+*NOTE: This method returns a generator, so if you wish to get all of the results instantly, you should encapsulate the
+call within the `list()` function*
+
+```python
+all_dcs_generator = client.datacenters().get_all()
+for dc in all_dcs_generator:
+    print(dc.id)
+    
+all_dcs_list = list(client.datacenters().get_all())
+print(all_dcs_list)
+```
+
+##### Get all datacenters by name
+
+To get all datacenters filtered by a name, call the `get_all()` method with the name parameter populated.
+
+```python
+all_dcs = list(client.datacenters().get_all(name="fsn1-dc8"))
+print(all_dcs)
+```
+
+##### Get datacenter by id
+
+To get a datacenter by id, simply call the `get()` method on the datacenter action, passing in the id of the datacenter
+you wish to get information for.
+
+```python
+datacenter = client.datacenters().get(1)
+print(datacenter.name)
+```
