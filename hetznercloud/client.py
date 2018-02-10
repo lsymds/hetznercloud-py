@@ -1,3 +1,4 @@
+from .isos import HetznerCloudIsosAction
 from .datacenters import HetznerCloudDatacentersAction
 from .locations import HetznerCloudLocationsAction
 from .exceptions import HetznerConfigurationException
@@ -84,7 +85,12 @@ class HetznerCloudClient(object):
         pass
 
     def isos(self):
-        pass
+        """
+        Returns an action object that contains all functionality related to ISOs within Hetzner Cloud.
+
+        :return: An action object related to isos
+        """
+        return HetznerCloudIsosAction(self.configuration)
 
     def locations(self):
         """

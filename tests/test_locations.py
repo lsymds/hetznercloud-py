@@ -7,12 +7,12 @@ class TestLocations(BaseHetznerTest):
         self.assertIsNotNone(locations)
         self.assertTrue(len(locations) > 0)
 
-    def test_can_filter_datacenters_by_name(self):
+    def test_can_filter_locations_by_name(self):
         locations = list(self.client.locations().get_all(name="fsn1"))
         self.assertIsNotNone(locations)
         self.assertTrue(len(locations) == 1)
 
-    def test_can_get_dc_by_id(self):
+    def test_can_get_location_by_id(self):
         location = self.client.locations().get(1)
 
         self.assertTrue(location.id)
