@@ -62,7 +62,7 @@ class HetznerCloudIso(object):
     def _load_from_json(json):
         iso = HetznerCloudIso()
 
-        iso.id = json["id"]
+        iso.id = int(json["id"])
         iso.name = json["name"]
         iso.description = json["description"]
         iso.type = json["type"]

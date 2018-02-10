@@ -65,12 +65,12 @@ class HetznerCloudLocation(object):
     def _load_from_json(json):
         location = HetznerCloudLocation()
 
-        location.id = json["id"]
+        location.id = int(json["id"])
         location.name = json["name"]
         location.description = json["description"]
         location.country = json["country"]
         location.city = json["city"]
-        location.latitude = json["latitude"]
-        location.longitude = json["longitude"]
+        location.latitude = float(json["latitude"])
+        location.longitude = float(json["longitude"])
 
         return location

@@ -1,7 +1,8 @@
-from .isos import HetznerCloudIsosAction
 from .datacenters import HetznerCloudDatacentersAction
-from .locations import HetznerCloudLocationsAction
 from .exceptions import HetznerConfigurationException
+from .isos import HetznerCloudIsosAction
+from .locations import HetznerCloudLocationsAction
+from .server_types import HetznerCloudServerTypesAction
 from .servers import HetznerCloudServersAction
 
 
@@ -67,9 +68,6 @@ class HetznerCloudClient(object):
 
         self.configuration = configuration
 
-    def actions(self):
-        pass
-
     def datacentres(self):
         """
         Returns an action object that contains all functionality related to datacenters within Hetzner Cloud.
@@ -100,11 +98,13 @@ class HetznerCloudClient(object):
         """
         return HetznerCloudLocationsAction(self.configuration)
 
-    def metrics(self):
-        pass
-
     def server_types(self):
-        pass
+        """
+        Returns an action object that contains all functionality related to server types within the Hetzner Cloud.
+
+        :return: An action object related to server types
+        """
+        return HetznerCloudServerTypesAction(self.configuration)
 
     def servers(self):
         """

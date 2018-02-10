@@ -57,6 +57,11 @@ A Python SDK for the new (and wonderful) Hetzner cloud service.
             * [Get all locations](#get-all-locations)
             * [Get all locations by name](#get-all-locations-by-name)
             * [Get a location by id](#get-location-by-id)
+    * [Server types](#server-size-types)
+        * [Top level actions](#server-types-top-level-actions)
+            * [Get all server types](#get-all-server-types)
+            * [Get all server types by name](#get-all-server-types-by-name)
+            * [Get a server type by id](#get-server-type-by-id)
 
 ## State
 
@@ -607,4 +612,47 @@ you wish to get information for.
 ```python
 location = client.locations().get(1)
 print(location.name)
+```
+
+### Server size types
+
+#### Top level actions
+
+The server types top level action can be retrieved by calling the `server_types()` method on the `HetznerCloudClient`
+instance.
+
+##### Get all server types
+
+To retrieve all of the server types available on the Hetzner Cloud service, simply call the `get_all()` method, passing
+in no parameters.
+
+*NOTE: This method returns a generator, so if you wish to get all of the results instantly, you should encapsulate the
+call within the `list()` function*
+
+```python
+types = client.server_types().get_all()
+for l in types:
+    print(l.id)
+    
+types = list(client.server_types().get_all())
+print(types)
+```
+
+##### Get all server types by name
+
+To get all server types filtered by a name, call the `get_all()` method with the name parameter populated.
+
+```python
+server_types = list(client.server_types().get_all(name="cx11"))
+print(server_types)
+```
+
+##### Get server type by id
+
+To get a server type by id, simply call the `get()` method on the datacenter action, passing in the id of the server type
+you wish to get information for.
+
+```python
+stype = client.server_types().get(1)
+print(stype.name)
 ```

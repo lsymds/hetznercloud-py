@@ -1,5 +1,5 @@
-from .locations import HetznerCloudLocation
 from .exceptions import HetznerActionException
+from .locations import HetznerCloudLocation
 from .shared import _get_results
 
 
@@ -65,7 +65,7 @@ class HetznerCloudDatacenter(object):
     def _load_from_json(json):
         dc = HetznerCloudDatacenter()
 
-        dc.id = json["id"]
+        dc.id = int(json["id"])
         dc.name = json["name"]
         dc.description = json["description"]
         dc.location = HetznerCloudLocation._load_from_json(json["location"])
