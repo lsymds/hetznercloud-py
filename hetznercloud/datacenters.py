@@ -1,3 +1,4 @@
+from .locations import HetznerCloudLocation
 from .exceptions import HetznerActionException
 from .shared import _get_results
 
@@ -56,7 +57,7 @@ class HetznerCloudDatacenter(object):
         self.id = 0
         self.name = ""
         self.description = ""
-        self.location_id = 0
+        self.location = None
         self.supported_server_types = []
         self.available_server_types = []
 
@@ -67,7 +68,7 @@ class HetznerCloudDatacenter(object):
         dc.id = json["id"]
         dc.name = json["name"]
         dc.description = json["description"]
-        dc.location_id = json["location"]["id"]
+        dc.location = HetznerCloudLocation._load_from_json(json["location"])
         dc.supported_server_types = json["server_types"]["supported"]
         dc.available_server_types = json["server_types"]["available"]
 

@@ -46,7 +46,12 @@ A Python SDK for the new (and wonderful) Hetzner cloud service.
         * [Top level actions](#datacenter-top-level-actions)
             * [Get all datacenters](#get-all-datacenters)
             * [Get all datacenters by name](#get-all-datacenters-by-name)
-            * [Get by id](#get-datacenter-by-id)
+            * [Get a datacenter by id](#get-datacenter-by-id)
+    * [Locations](#locations)
+        * [Top level actions](#locations-top-level-actions)
+            * [Get all locations](#get-all-locations)
+            * [Get all locations by name](#get-all-locations-by-name)
+            * [Get a location by id](#get-location-by-id)
 
 ## State
 
@@ -511,4 +516,47 @@ you wish to get information for.
 ```python
 datacenter = client.datacenters().get(1)
 print(datacenter.name)
+```
+
+### Locations
+
+#### Top level actions
+
+The location top level action can be retrieved by calling the `locations()` method on the `HetznerCloudClient`
+instance.
+
+##### Get all locations
+
+To retrieve all of the locations available on the Hetzner Cloud service, simply call the `get_all()` method, passing
+in no parameters.
+
+*NOTE: This method returns a generator, so if you wish to get all of the results instantly, you should encapsulate the
+call within the `list()` function*
+
+```python
+all_locs_generator = client.locations().get_all()
+for l in all_locs_generator:
+    print(l.id)
+    
+all_locs_list = list(client.locations().get_all())
+print(all_locs_list)
+```
+
+##### Get all locations by name
+
+To get all locations filtered by a name, call the `get_all()` method with the name parameter populated.
+
+```python
+all_locs = list(client.locations().get_all(name="fsn1"))
+print(all_locs)
+```
+
+##### Get location by id
+
+To get a location by id, simply call the `get()` method on the datacenter action, passing in the id of the location
+you wish to get information for.
+
+```python
+location = client.locations().get(1)
+print(location.name)
 ```

@@ -18,6 +18,6 @@ class TestDatacenters(BaseHetznerTest):
         self.assertTrue(dc.id)
         self.assertTrue(dc.name)
         self.assertTrue(dc.description)
-        self.assertTrue(dc.location_id)
+        self.assertIsNotNone(dc.location)
         self.assertTrue(len(dc.available_server_types) > 0)
         self.assertTrue(len(dc.supported_server_types) > 0)

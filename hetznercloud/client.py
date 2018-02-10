@@ -1,4 +1,5 @@
-from hetznercloud.datacenters import HetznerCloudDatacentersAction
+from .datacenters import HetznerCloudDatacentersAction
+from .locations import HetznerCloudLocationsAction
 from .exceptions import HetznerConfigurationException
 from .servers import HetznerCloudServersAction
 
@@ -86,7 +87,12 @@ class HetznerCloudClient(object):
         pass
 
     def locations(self):
-        pass
+        """
+        Returns an action object that contains all functionality related to locations within Hetzner Cloud.
+
+        :return: An action object related to locations
+        """
+        return HetznerCloudLocationsAction(self.configuration)
 
     def metrics(self):
         pass
