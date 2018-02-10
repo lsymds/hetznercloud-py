@@ -1,5 +1,5 @@
 from hetznercloud import SERVER_STATUS_OFF, ACTION_STATUS_SUCCESS, SERVER_STATUS_RUNNING, \
-    BACKUP_WINDOW_10PM_2AM, HetznerActionException, SERVER_TYPE_2CPU_4GB, SERVER_TYPE_1CPU_2GB
+    BACKUP_WINDOW_10PM_2AM, HetznerActionException, SERVER_TYPE_2CPU_4GB, SERVER_TYPE_1CPU_2GB, IMAGE_UBUNTU_1604
 from tests.base import BaseHetznerTest
 
 
@@ -25,8 +25,8 @@ class TestServers(BaseHetznerTest):
         self.assertIsNotNone(created_server)
         self.assertIsNotNone(created_server.id)
         self.assertEqual(created_server.name, "test-server-can-be-created")
-        self.assertEqual(created_server.image_id, 1)
-        self.assertEqual(created_server.server_type_id, 1)
+        self.assertEqual(created_server.image_id, IMAGE_UBUNTU_1604)
+        self.assertEqual(created_server.server_type, SERVER_TYPE_1CPU_2GB)
 
     def test_server_can_be_created_but_offline(self):
         created_server, _ = self.create_server("test-server-can-be-created-offline", False)
@@ -41,6 +41,7 @@ class TestServers(BaseHetznerTest):
 
         root_password, action = created_server.enable_rescue_mode()
         self.assertIsNotNone(root_password)
+        self.assertTrue(created_server.rescue_enabled)
         action.wait_until_status_is(ACTION_STATUS_SUCCESS)
 
     def test_rescue_mode_can_be_disabled_on_a_server(self):
@@ -49,9 +50,11 @@ class TestServers(BaseHetznerTest):
 
         _, action = created_server.enable_rescue_mode()
         action.wait_until_status_is(ACTION_STATUS_SUCCESS)
+        self.assertTrue(created_server.rescue_enabled)
 
         action = created_server.disable_rescue_mode()
         action.wait_until_status_is(ACTION_STATUS_SUCCESS)
+        self.assertFalse(created_server.rescue_enabled)
 
     def test_can_rename_a_server(self):
         created_server, _ = self.create_server("test-server-rename")
@@ -87,6 +90,7 @@ class TestServers(BaseHetznerTest):
 
         attach_iso_action = created_server.attach_iso("virtio-win-0.1.141.iso")
         attach_iso_action.wait_until_status_is(ACTION_STATUS_SUCCESS)
+        self.assertEqual(created_server.iso, "virtio-win-0.1.141.iso")
 
     def test_can_change_reverse_dns_of_a_server(self):
         created_server, _ = self.create_server("test-can-change-reverse-dns")
@@ -102,10 +106,14 @@ class TestServers(BaseHetznerTest):
         action.wait_until_status_is(ACTION_STATUS_SUCCESS)
 
         action = created_server.change_type(SERVER_TYPE_2CPU_4GB, False)
+        print(action)
         action.wait_until_status_is(ACTION_STATUS_SUCCESS)
+        self.assertEqual(created_server.server_type, SERVER_TYPE_2CPU_4GB)
 
         action = created_server.change_type(SERVER_TYPE_1CPU_2GB, False)
+        print(action)
         action.wait_until_status_is(ACTION_STATUS_SUCCESS)
+        self.assertEqual(created_server.server_type, SERVER_TYPE_1CPU_2GB)
 
     def test_can_power_off_a_server(self):
         created_server, _ = self.create_server("test-can-power-off-server")
@@ -116,7 +124,7 @@ class TestServers(BaseHetznerTest):
 
         self.assertEqual(created_server.status, SERVER_STATUS_OFF)
 
-    def test_can_power_off_a_server(self):
+    def test_can_power_on_a_server(self):
         created_server, _ = self.create_server("test-can-power-on-server")
         created_server.wait_until_status_is(SERVER_STATUS_RUNNING)
 
@@ -127,5 +135,27 @@ class TestServers(BaseHetznerTest):
         action.wait_until_status_is(ACTION_STATUS_SUCCESS)
 
         self.assertEqual(created_server.status, SERVER_STATUS_RUNNING)
+
+    def test_can_rebuild_a_server(self):
+        created_server, _ = self.create_server("test-can-rebuild-a-server")
+        created_server.wait_until_status_is(SERVER_STATUS_RUNNING)
+
+        action = created_server.rebuild_from_image(IMAGE_UBUNTU_1604)
+        action.wait_until_status_is(ACTION_STATUS_SUCCESS)
+
+        self.assertEqual(created_server.image_id, IMAGE_UBUNTU_1604)
+
+    def test_can_reset_a_server(self):
+        created_server, _ = self.create_server("test-can-reset-a-server")
+        created_server.wait_until_status_is(SERVER_STATUS_RUNNING)
+
+        created_server.reset()
+
+    def test_can_reset_a_servers_root_password(self):
+        created_server, _ = self.create_server("test-can-reset-a-servers-root-password")
+        created_server.wait_until_status_is(SERVER_STATUS_RUNNING)
+
+        pw, _ = created_server.reset_root_password()
+        self.assertIsNotNone(pw)
 
 

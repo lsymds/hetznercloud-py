@@ -121,10 +121,10 @@ class HetznerCloudServer(object):
         self.created = None
         self.public_net_ipv4 = ""
         self.public_net_ipv6 = ""
-        self.server_type_id = 0
+        self.server_type = ""
         self.datacenter_id = 0
-        self.image_id = 0
-        self.iso_id = 0
+        self.image_id = ""
+        self.iso = ""
         self.rescue_enabled = False
         self.locked = False
         self.backup_window = ""
@@ -149,6 +149,8 @@ class HetznerCloudServer(object):
                                            body={"iso": iso})
         if status_code != 201:
             raise HetznerActionException(result)
+
+        self.iso = iso
 
         return HetznerCloudAction._load_from_json(self._config, result["action"])
 
@@ -204,6 +206,8 @@ class HetznerCloudServer(object):
         if status_code != 201:
             raise HetznerActionException(result)
 
+        self.server_type = new_instance_type
+
         return HetznerCloudAction._load_from_json(self._config, result["action"])
 
     def delete(self):
@@ -215,6 +219,8 @@ class HetznerCloudServer(object):
         status_code, result = _get_results(self._config, "servers/%s" % self.id, method="DELETE")
         if status_code != 200:
             raise HetznerActionException(result)
+
+        self.iso = ""
 
         return HetznerCloudAction._load_from_json(self._config, result["action"])
 
@@ -339,19 +345,74 @@ class HetznerCloudServer(object):
         return HetznerCloudAction._load_from_json(self._config, result["action"])
 
     def soft_reboot(self):
-        pass
+        """
+        Performs a soft reboot on the server, equivalent to going to the 'start menu' on a Windows computer and hitting
+        'Restart'.
 
-    def rebuild_from_image(self):
-        pass
+        :return: The action related to the soft reboot of the server.
+        """
+        status_code, result = _get_results(self._config, "servers/%s/actions/reboot" % self.id, method="POST")
+        if status_code != 201:
+            raise HetznerActionException(result)
+
+        return HetznerCloudAction._load_from_json(self._config, result["action"])
+
+    def rebuild_from_image(self, image):
+        """
+        Rebuilds the server with the content of the image. It is important that you know that this method will
+        completely destroy all data on the server.
+
+        :param image: The id or name of the image to overwrite the server with.
+        :return: The action related to the rebuilding of the server.
+        """
+        if not image:
+            raise HetznerInvalidArgumentException("image")
+
+        status_code, result = _get_results(self._config, "servers/%s/actions/rebuild" % self.id, method="POST",
+                                           body={"image": image})
+        if status_code != 201:
+            raise HetznerActionException(result)
+
+        self.image_id = image
+
+        return HetznerCloudAction._load_from_json(self._config, result["action"])
 
     def reset(self):
-        pass
+        """
+        Performs a hard reset on the server. Equivelent to pressing the 'Reset' button on most modern computers.
+
+        :return: The action related to the hard reset of the server.
+        """
+        status_code, result = _get_results(self._config, "servers/%s/actions/reset" % self.id, method="POST")
+        if status_code != 201:
+            raise HetznerActionException(result)
+
+        return HetznerCloudAction._load_from_json(self._config, result["action"])
 
     def reset_root_password(self):
-        pass
+        """
+        Resets the root password on the server.
+
+        :return: A tuple containing the root password and the action related to the resetting of the root password.
+        """
+        status_code, result = _get_results(self._config, "servers/%s/actions/reset_password" % self.id, method="POST")
+        if status_code != 201:
+            raise HetznerActionException(result)
+
+        return result["root_password"], HetznerCloudAction._load_from_json(self._config, result["action"])
 
     def shutdown(self):
-        pass
+        """
+        Attempts to perform a graceful shutdown on the server by sending an ACPI shutdown request. If the server
+        OS does not support ACPI, then this will not work.
+
+        :return: The action related to the shutdown of the server.
+        """
+        status_code, result = _get_results(self._config, "servers/%s/actions/shutdown" % self.id, method="POST")
+        if status_code != 201:
+            raise HetznerActionException(result)
+
+        return HetznerCloudAction._load_from_json(self._config, result["action"])
 
     def wait_until_status_is(self, status, attempts=20, wait_seconds=1):
         """
@@ -385,10 +446,10 @@ class HetznerCloudServer(object):
         cloud_server.created = json["created"]
         cloud_server.public_net_ipv4 = json["public_net"]["ipv4"]["ip"]
         cloud_server.public_net_ipv6 = json["public_net"]["ipv6"]["ip"]
-        cloud_server.server_type_id = int(json["server_type"]["id"])
+        cloud_server.server_type = json["server_type"]["name"]
         cloud_server.datacenter_id = int(json["datacenter"]["id"] if json["datacenter"] is not None else 0)
-        cloud_server.image_id = int(json["image"]["id"] if json["image"] is not None else 0)
-        cloud_server.iso_id = int(json["iso"]["id"] if json["iso"] is not None else 0)
+        cloud_server.image_id = json["image"]["name"] if json["image"] is not None else ""
+        cloud_server.iso_id = json["iso"]["name"] if json["iso"] is not None else ""
         cloud_server.rescue_enabled = bool(json["rescue_enabled"])
         cloud_server.locked = bool(json["locked"])
         cloud_server.backup_window = json["backup_window"]

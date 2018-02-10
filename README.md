@@ -36,6 +36,11 @@ A Python SDK for the new (and wonderful) Hetzner cloud service.
             * [Enable rescue mode](#enable-rescue-mode)
             * [Image](#image-server)
             * [Power on](#power-on)
+            * [Power off](#power-off)
+            * [Rebuild from image](#rebuild-from-image)
+            * [Reset](#reset-server)
+            * [Reset root password](#reset-root-password)
+            * [Shutdown](#shutdown-server)
             * [Wait for status](#wait-for-server-status)
 
 ## State
@@ -388,6 +393,54 @@ To power a server on, simply call the `power_on()` method on the server object.
 #### Power off
 
 To power a server off, simply call the `power_off()` method on the server object.
+
+#### Rebuild from image
+
+To rebuild a server from an image, simply call the `rebuild_from_image()` method on the server object, passing in the
+image id or name you wish to overwrite the server with.
+
+*NOTE: This method will destroy **all** data on the server*
+
+```python
+server = client.servers().get(1)
+action = server.rebuild_from_image(IMAGE_UBUNTU_1604)
+
+action.wait_until_status_is(ACTION_STATUS_SUCCESS)
+```
+
+#### Reset server
+
+To reset a server (equivelent to pulling the power cord and plugging it back in), simply call the `reset()` method on
+the server object.
+
+```python
+server = client.servers().get(1)
+action = server.reset()
+action.wait_until_status_is(ACTION_STATUS_SUCCESS)
+```
+
+#### Reset root password
+
+To reset the password of the Root account on a server, simply call the `reset_root_password()` method on the server
+object. 
+
+```python
+server = client.servers().get(1)
+root_password, reset_action = server.reset_root_password()
+
+print("The new root password is %s" % root_password)
+```
+
+#### Shutdown server
+
+To shutdown a server gracefully, simply call the `shutdown()` method on the server object.
+
+*NOTE: The OS on the server you are trying to shut down must support ACPI.*
+
+```python
+server = client.servers().get(1)
+server.shutdown()
+```
 
 #### Wait for server status
 
