@@ -19,6 +19,7 @@ A Python SDK for the new (and wonderful) Hetzner cloud service.
             * [Datacentres](#datacentre-constants)
             * [Backup windows](#backup-windows)
             * [Image types](#image-types)
+            * [Image sorts](#image-sorts)
     * [Servers](#servers)
         * [Top level actions](#server-top-level-actions)
             * [Get all servers](#get-all-servers)
@@ -189,6 +190,17 @@ Constants that represent image types.
 
 * `IMAGE_TYPE_BACKUP` - A manual backup of a server, which is then bound to the server it was created from.
 * `IMAGE_TYPE_SNAPSHOT` - A snapshot of a server that can be used to create other servers. 
+
+##### Image sorts
+
+Constants that define the different ways that images can be sorted.
+
+* `SORT_BY_ID_ASC` - Sorts the images by their numerical id in ascending order.
+* `SORT_BY_ID_DESC` - Sorts the images by their numerical id in descending order.
+* `SORT_BY_NAME_ASC` - Sorts the images by their name in ascending character order.
+* `SORT_BY_NAME_DESC` - Sorts the images by their name in descending character order.
+* `SORT_BY_CREATED_ASC` - Sorts the images by their created date in ascending order.
+* `SORT_BY_CREATED_DESC` - Sorts the images by their created date in descending order.
 
 #### Standard exceptions
 
