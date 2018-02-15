@@ -1,3 +1,4 @@
+from .images import HetznerCloudImagesAction
 from .datacenters import HetznerCloudDatacentersAction
 from .exceptions import HetznerConfigurationException
 from .isos import HetznerCloudIsosAction
@@ -80,7 +81,14 @@ class HetznerCloudClient(object):
         pass
 
     def images(self):
-        pass
+        """
+        Returns an action object that contains all functionality related to images within Hetzner Cloud.
+
+        NOTE: This top level action does not allow you to image a server.
+
+        :return: An action object related to images.
+        """
+        return HetznerCloudImagesAction(self.configuration)
 
     def isos(self):
         """

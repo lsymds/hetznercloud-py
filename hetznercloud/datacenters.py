@@ -38,7 +38,7 @@ class HetznerCloudDatacentersAction(object):
         :param id: The id of the datacenter to retrieve.
         :return: The HetznerCloudDatacenter object.
         """
-        status_code, results = _get_results(self._config, "datacenters/%s" % id, method="GET")
+        status_code, results = _get_results(self._config, "datacenters/%s" % id)
         if status_code != 200:
             raise HetznerActionException(results)
 

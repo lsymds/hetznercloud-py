@@ -36,7 +36,7 @@ class HetznerCloudServerTypesAction(object):
         :param id: The id of the server type to retrieve.
         :return: The HetznerCloudServerType object.
         """
-        status_code, results = _get_results(self._config, "server_types/%s" % id, method="GET")
+        status_code, results = _get_results(self._config, "server_types/%s" % id)
         if status_code != 200:
             raise HetznerActionException(results)
 

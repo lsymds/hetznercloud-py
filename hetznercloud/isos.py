@@ -37,7 +37,7 @@ class HetznerCloudIsosAction(object):
         :param id: The id of the iso to retrieve.
         :return: The HetznerCloudIso object.
         """
-        status_code, results = _get_results(self._config, "isos/%s" % id, method="GET")
+        status_code, results = _get_results(self._config, "isos/%s" % id)
         if status_code != 200:
             raise HetznerActionException(results)
 

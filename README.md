@@ -5,6 +5,7 @@
 A Python SDK for the new (and wonderful) Hetzner cloud service.
 
 * [State](#state)
+* [Contributing](#contributing)
 * [Usage](#documentation)
     * [Installation](#installation)
     * [Getting started](#getting-started)
@@ -66,7 +67,12 @@ A Python SDK for the new (and wonderful) Hetzner cloud service.
 ## State
 
 The SDK is currently under development. Please switch to the develop branch of this project if you wish to see the 
-progress made on it so far.
+progress made on it so far. 
+
+## Contributing
+
+Open source contributions are more than welcome to be submitted to this repository and every issue and pull request will be
+promptly reviewed and evaluated on its suitability to be merged into the main branches. 
 
 ## Documentation
 
