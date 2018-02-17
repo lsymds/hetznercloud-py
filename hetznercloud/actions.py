@@ -33,6 +33,7 @@ class HetznerCloudAction(object):
         """
         Sleeps the executing thread (a second each loop) until the status is either what the user requires or the
         attempt count is exceeded, in which case an exception is thrown.
+
         :param status: The status the action needs to be.
         :param attempts: The number of attempts to query the action's status.
         :param wait_seconds: The number of seconds to wait for between each attempt.

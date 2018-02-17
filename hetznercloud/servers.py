@@ -17,41 +17,10 @@ def _get_server_json(config, server_id):
 
 
 class HetznerCloudServersAction(object):
-    """
-    This action contains all top-level calls related to servers. Specific server-related calls (such as deleting or
-    imaging a server) are done by first retrieving the server (by using the get_all or get methods in this class) and
-    then calling the required method on the object returned.
-
-    :Example:
-    
-        # To delete the server, you first have to retrieve it.
-        my_server = client.servers().get(32)
-
-        # And then you can delete it.
-        my_server.delete()
-    """
-
     def __init__(self, config):
-        """
-        Creates a new instance of the HetznerCloudServersAction class.
-
-        :param config: The HetznerCloudConfiguration object, which defines the version of the API the users wish to use.
-        """
         self._config = config
 
     def create(self, name, server_type, image, datacenter=None, start_after_create=True, ssh_keys=[], user_data=None):
-        """
-        Creates a new server in the Hetzner Cloud.
-
-        :param name: The name of the server.
-        :param server_type: The size of the server (i.e. VPS-1, VPS-2).
-        :param datacenter: The datacenter to create the server in.
-        :param start_after_create: Whether to start the server after it is created (defaults to True).
-        :param image: The image to create the server from.
-        :param ssh_keys: An array of SSH key names to apply to the server.
-        :param user_data: Cloud-Init user data
-        :return: A HetznerCloudServer object, that has more options that can modify the server.
-        """
         if not name or not server_type or not image:
             raise HetznerInvalidArgumentException("name" if not name
                                                   else "server_type" if not server_type
@@ -80,39 +49,18 @@ class HetznerCloudServersAction(object):
                HetznerCloudAction._load_from_json(self._config, result["action"])
 
     def get(self, server_id):
-        """
-        Gets a server by its defined id.
-
-        :param server_id: The server's id.
-        :return: A server object if the server exists, or a HetznerServerNotFoundException.
-        """
         if not isinstance(server_id, int) or server_id == 0:
             raise HetznerServerNotFoundException()
 
         return HetznerCloudServer._load_from_json(self._config, _get_server_json(self._config, server_id))
 
     def get_all(self, name=None):
-        """
-        Retrieves all of the servers associated with the API key's project, but also allows you to filter by name.
-        Leaving the "name" parameter as None (or empty) will result in all servers associated with the API key's project
-        being brought back.
-
-        Note: Wildcards are NOT currently supported (by this SDK or the API).
-
-        :param name: The name to filter the servers by.
-        :return: An array of server objects.
-        :rtype: HetznerCloudServer[]
-        """
-        status_code, results = _get_results(self._config, "servers", {"name": name} if name is not None else None)
+        results = _get_results(self._config, "servers", {"name": name} if name is not None else None)
         for result in results["servers"]:
             yield HetznerCloudServer._load_from_json(self._config, result)
 
 
 class HetznerCloudServer(object):
-    """
-    Represents a cloud server that has been created.
-    """
-
     def __init__(self, config):
         self._config = config
         self.id = 0
@@ -134,14 +82,6 @@ class HetznerCloudServer(object):
         self.root_password = ""
 
     def attach_iso(self, iso):
-        """
-        Attaches an ISO that has been uploaded to Hetzner Cloud to the current server.
-
-        NOTE: You will need to reboot your server for the ISO to be booted into.
-
-        :param iso: The ISO that should be mounted to the server.
-        :return: The action related to the mounting of the ISO.
-        """
         if not iso:
             raise HetznerInvalidArgumentException("iso")
 
@@ -155,11 +95,6 @@ class HetznerCloudServer(object):
         return HetznerCloudAction._load_from_json(self._config, result["action"])
 
     def change_name(self, new_name):
-        """
-        Changes the name of the server to a new, DNS compliant name.
-
-        :param new_name: The string that the server should be renamed to. NOTE: This value should be DNS compliant.
-        """
         if not new_name:
             raise HetznerInvalidArgumentException("new_name")
 
@@ -171,14 +106,6 @@ class HetznerCloudServer(object):
         self.name = new_name
 
     def change_reverse_dns_entry(self, ip, dns_pointer=None):
-        """
-        Changes the reverse DNS entry associated with the server to that of the parameters passed into this method.
-
-        :param ip: The IP address for the reverse DNS entry.
-        :param dns_pointer: The optional DNS name. If this is left as "None", then the DNS entry will be reset back to
-        its original value when the server was first created.
-        :return: The action related to the change of the DNS entry.
-        """
         if not ip:
             raise HetznerInvalidArgumentException("ip")
 
@@ -190,14 +117,6 @@ class HetznerCloudServer(object):
         return HetznerCloudAction._load_from_json(self._config, result["action"])
 
     def change_type(self, new_instance_type, upgrade_disk=True):
-        """
-        Changes the type of the server (i.e. a small instance to a larger instance).
-
-        :param new_instance_type: The new instance type to scale the server to.
-        :param upgrade_disk: Whether to upgrade the disk. If false, it will be possible to downgrade the server type
-        later. If true, it will not be possible to downgrade the server.
-        :return: The action related to the change of the server type.
-        """
         if not new_instance_type:
             raise HetznerInvalidArgumentException("new_instance_type")
 
@@ -211,11 +130,6 @@ class HetznerCloudServer(object):
         return HetznerCloudAction._load_from_json(self._config, result["action"])
 
     def delete(self):
-        """
-        Deletes the server, making it immediately unavailable for any further use.
-
-        :return: The action related to the deletion of the server.
-        """
         status_code, result = _get_results(self._config, "servers/%s" % self.id, method="DELETE")
         if status_code != 200:
             raise HetznerActionException(result)
@@ -225,12 +139,6 @@ class HetznerCloudServer(object):
         return HetznerCloudAction._load_from_json(self._config, result["action"])
 
     def detach_iso(self):
-        """
-        Detaches a mounted ISO (if present) from the current server. If there is no ISO mounted, then the action
-        returned will have its status set immediately to true.
-
-        :return: The action related to the removal of the ISO from the server.
-        """
         status_code, result = _get_results(self._config, "servers/%s/actions/detach_iso", method="POST")
         if status_code != 201:
             return HetznerActionException(result)
@@ -238,11 +146,6 @@ class HetznerCloudServer(object):
         return HetznerCloudAction._load_from_json(self._config, result["action"])
 
     def disable_rescue_mode(self):
-        """
-        Disables rescue mode for the current server.
-
-        :return: The action related to the disabling of rescue mode for the current server.
-        """
         status_code, result = _get_results(self._config, "servers/%s/actions/disable_rescue" % self.id, method="POST")
         if status_code != 201:
             raise HetznerActionException(result)
@@ -252,12 +155,6 @@ class HetznerCloudServer(object):
         return HetznerCloudAction._load_from_json(self._config, result["action"])
 
     def enable_backups(self, backup_window=BACKUP_WINDOW_2AM_6AM):
-        """
-        Enables backups for the current server.
-
-        :param backup_window: The backup window defined in the following format: HH-HH (i.e. 02-04).
-        :return: The action related to the enabling of the backups for the current server.
-        """
         status_code, result = _get_results(self._config, "servers/%s/actions/enable_backup" % self.id, method="POST",
                                            body={"backup_window": backup_window})
         if status_code != 201:
@@ -297,13 +194,6 @@ class HetznerCloudServer(object):
         return result["root_password"], HetznerCloudAction._load_from_json(self._config, result["action"])
 
     def image(self, description=None, image_type="snapshot"):
-        """
-        Images the server in a way defined by the image_type parameter.
-
-        :param description: The description of the image.
-        :param image_type: The type of the image, possible options are: backup or snapshot.
-        :return: The image id and the action related to the creation of the image.
-        """
         body = {"type": image_type}
         if description is not None:
             body["description"] = description
@@ -316,11 +206,6 @@ class HetznerCloudServer(object):
         return result["image"]["id"], HetznerCloudAction._load_from_json(self._config, result["action"])
 
     def power_on(self):
-        """
-        Powers on a server. If the server is already running, then a successful action is returned.
-
-        :return: The action related to powering on the server.
-        """
         status_code, result = _get_results(self._config, "servers/%s/actions/poweron" % self.id, method="POST")
         if status_code != 201:
             raise HetznerActionException(result)
@@ -330,12 +215,6 @@ class HetznerCloudServer(object):
         return HetznerCloudAction._load_from_json(self._config, result["action"])
 
     def power_off(self):
-        """
-        Powers off a server. This forcefully stops the server, and is equivelent to pulling the power cord out of the
-        plug socket. Data loss could happen by calling this method.
-
-        :return: The action related to powering off the server.
-        """
         status_code, result = _get_results(self._config, "servers/%s/actions/poweroff" % self.id, method="POST")
         if status_code != 201:
             raise HetznerActionException(result)
@@ -345,12 +224,6 @@ class HetznerCloudServer(object):
         return HetznerCloudAction._load_from_json(self._config, result["action"])
 
     def soft_reboot(self):
-        """
-        Performs a soft reboot on the server, equivalent to going to the 'start menu' on a Windows computer and hitting
-        'Restart'.
-
-        :return: The action related to the soft reboot of the server.
-        """
         status_code, result = _get_results(self._config, "servers/%s/actions/reboot" % self.id, method="POST")
         if status_code != 201:
             raise HetznerActionException(result)
@@ -358,13 +231,6 @@ class HetznerCloudServer(object):
         return HetznerCloudAction._load_from_json(self._config, result["action"])
 
     def rebuild_from_image(self, image):
-        """
-        Rebuilds the server with the content of the image. It is important that you know that this method will
-        completely destroy all data on the server.
-
-        :param image: The id or name of the image to overwrite the server with.
-        :return: The action related to the rebuilding of the server.
-        """
         if not image:
             raise HetznerInvalidArgumentException("image")
 
@@ -378,11 +244,6 @@ class HetznerCloudServer(object):
         return HetznerCloudAction._load_from_json(self._config, result["action"])
 
     def reset(self):
-        """
-        Performs a hard reset on the server. Equivelent to pressing the 'Reset' button on most modern computers.
-
-        :return: The action related to the hard reset of the server.
-        """
         status_code, result = _get_results(self._config, "servers/%s/actions/reset" % self.id, method="POST")
         if status_code != 201:
             raise HetznerActionException(result)
@@ -390,11 +251,6 @@ class HetznerCloudServer(object):
         return HetznerCloudAction._load_from_json(self._config, result["action"])
 
     def reset_root_password(self):
-        """
-        Resets the root password on the server.
-
-        :return: A tuple containing the root password and the action related to the resetting of the root password.
-        """
         status_code, result = _get_results(self._config, "servers/%s/actions/reset_password" % self.id, method="POST")
         if status_code != 201:
             raise HetznerActionException(result)
@@ -402,12 +258,6 @@ class HetznerCloudServer(object):
         return result["root_password"], HetznerCloudAction._load_from_json(self._config, result["action"])
 
     def shutdown(self):
-        """
-        Attempts to perform a graceful shutdown on the server by sending an ACPI shutdown request. If the server
-        OS does not support ACPI, then this will not work.
-
-        :return: The action related to the shutdown of the server.
-        """
         status_code, result = _get_results(self._config, "servers/%s/actions/shutdown" % self.id, method="POST")
         if status_code != 201:
             raise HetznerActionException(result)
@@ -418,6 +268,7 @@ class HetznerCloudServer(object):
         """
         Sleeps the executing thread (a second each loop) until the status is either what the user requires or the
         attempt count is exceeded, in which case an exception is thrown.
+
         :param status: The status the action needs to be.
         :param attempts: The number of attempts to query the action's status.
         :param wait_seconds: The number of seconds to wait for between each attempt.

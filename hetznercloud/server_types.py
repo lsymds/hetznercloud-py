@@ -3,24 +3,10 @@ from .shared import _get_results
 
 
 class HetznerCloudServerTypesAction(object):
-    """
-    This action contains all functionality related to server types in the Hetzner Cloud service.
-    """
     def __init__(self, config):
-        """
-        Initialises a new instance of the HetznerCloudServerTypesAction.
-
-        :param config: A HetznerCloudClientConfiguration object.
-        """
         self._config = config
 
     def get_all(self, name=None):
-        """
-        Gets all of the server types available on the Hetzner Cloud service.
-
-        :param name: The optional name to filter the server types by.
-        :return: A generator of server types.
-        """
         status_code, results = _get_results(self._config, "server_types",
                                             url_params={"name": name} if name is not None else None)
         if status_code != 200:
@@ -30,12 +16,6 @@ class HetznerCloudServerTypesAction(object):
             yield HetznerCloudServerType._load_from_json(result)
 
     def get(self, id):
-        """
-        Gets a specific server type by its id.
-
-        :param id: The id of the server type to retrieve.
-        :return: The HetznerCloudServerType object.
-        """
         status_code, results = _get_results(self._config, "server_types/%s" % id)
         if status_code != 200:
             raise HetznerActionException(results)
@@ -44,14 +24,7 @@ class HetznerCloudServerTypesAction(object):
 
 
 class HetznerCloudServerType(object):
-    """
-    Represents a server type in the Hetzner Cloud service.
-    """
-
     def __init__(self):
-        """
-        Initialises a new instance of the HetznerCloudServerType object.
-        """
         self.id = 0
         self.name = ""
         self.description = ""
