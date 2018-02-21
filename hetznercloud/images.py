@@ -1,6 +1,6 @@
+from .constants import IMAGE_TYPE_SNAPSHOT
 from .exceptions import HetznerActionException
 from .shared import _get_results
-from .constants import IMAGE_TYPE_SNAPSHOT
 
 
 class HetznerCloudImagesAction(object):
@@ -51,10 +51,23 @@ class HetznerCloudImage(object):
         self.rapid_deploy = False
 
     def update(self, description, type=IMAGE_TYPE_SNAPSHOT):
-        pass
+        body = {}
+        if description is not None:
+            body["description"] = description
+        if type is not None:
+            body["type"] = type
+
+        status_code, result = _get_results(self._config, "images/%s" % self.id, method="PUT", body=body)
+        if status_code != 200:
+            raise HetznerActionException(result)
+
+        self.description = description
+        self.type = type
 
     def delete(self):
-        pass
+        status_code, result = _get_results(self._config, "images/%s" % self.id, method="DELETE")
+        if status_code != 200:
+            raise HetznerActionException(result)
 
     @staticmethod
     def _load_from_json(config, json):
