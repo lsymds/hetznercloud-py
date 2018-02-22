@@ -1,3 +1,4 @@
+from .ssh_keys import HetznerCloudSSHKeysAction
 from .images import HetznerCloudImagesAction
 from .datacenters import HetznerCloudDatacentersAction
 from .exceptions import HetznerConfigurationException
@@ -65,4 +66,4 @@ class HetznerCloudClient(object):
         return HetznerCloudServersAction(self.configuration)
 
     def ssh_keys(self):
-        pass
+        return HetznerCloudSSHKeysAction(self.configuration)
