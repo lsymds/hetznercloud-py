@@ -50,7 +50,7 @@ class HetznerCloudImage(object):
         self.os_version = ""
         self.rapid_deploy = False
 
-    def update(self, description, type=IMAGE_TYPE_SNAPSHOT):
+    def update(self, description=None, type=None):
         body = {}
         if description is not None:
             body["description"] = description

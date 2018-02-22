@@ -8,4 +8,5 @@ class TestImages(BaseHetznerTest):
         self.assertTrue(len(images) > 0)
 
     def test_can_get_image_by_id(self):
-        pass
+        image = self.client.images().get(1)
+        self.assertIsNotNone(image)
