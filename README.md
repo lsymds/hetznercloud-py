@@ -20,6 +20,28 @@ A Python SDK for the new (and wonderful) Hetzner cloud service.
             * [Backup windows](#backup-windows)
             * [Image types](#image-types)
             * [Image sorts](#image-sorts)
+    * [Datacenters](#datacenters)
+        * [Top level actions](#datacenter-top-level-actions)
+            * [Get all datacenters](#get-all-datacenters)
+            * [Get all datacenters by name](#get-all-datacenters-by-name)
+            * [Get a datacenter by id](#get-datacenter-by-id)
+    * [Images](#images)
+        * [Top level actions](#images-top-level-actions)
+            * [Get all images](#get-all-images)
+            * [Get image by id](#get-image-by-id)
+        * [Modifier actions (applies to a specific image)](#image-modifier-actions)
+            * [Update image](#update-image)
+            * [Delete image](#delete-image)
+    * [Isos](#isos)
+        * [Top level actions](#isos-top-level-actions)
+            * [Get all isos](#get-all-isos)
+            * [Get all isos by name](#get-all-isos-by-name)
+            * [Get an iso by id](#get-iso-by-id)
+    * [Locations](#locations)
+        * [Top level actions](#locations-top-level-actions)
+            * [Get all locations](#get-all-locations)
+            * [Get all locations by name](#get-all-locations-by-name)
+            * [Get a location by id](#get-location-by-id)
     * [Servers](#servers)
         * [Top level actions](#server-top-level-actions)
             * [Get all servers](#get-all-servers)
@@ -44,33 +66,20 @@ A Python SDK for the new (and wonderful) Hetzner cloud service.
             * [Reset root password](#reset-root-password)
             * [Shutdown](#shutdown-server)
             * [Wait for status](#wait-for-server-status)
-    * [Datacenters](#datacenters)
-        * [Top level actions](#datacenter-top-level-actions)
-            * [Get all datacenters](#get-all-datacenters)
-            * [Get all datacenters by name](#get-all-datacenters-by-name)
-            * [Get a datacenter by id](#get-datacenter-by-id)
-    * [Images](#images)
-        * [Top level actions](#images-top-level-actions)
-            * [Get all images](#get-all-images)
-            * [Get image by id](#get-image-by-id)
-        * [Modifier actions (applies to a specific image)](#image-modifier-actions)
-            * [Update image](#update-image)
-            * [Delete image](#delete-image)
-    * [Isos](#isos)
-        * [Top level actions](#isos-top-level-actions)
-            * [Get all isos](#get-all-isos)
-            * [Get all isos by name](#get-all-isos-by-name)
-            * [Get an iso by id](#get-iso-by-id)
-    * [Locations](#locations)
-        * [Top level actions](#locations-top-level-actions)
-            * [Get all locations](#get-all-locations)
-            * [Get all locations by name](#get-all-locations-by-name)
-            * [Get a location by id](#get-location-by-id)
     * [Server types](#server-size-types)
         * [Top level actions](#server-types-top-level-actions)
             * [Get all server types](#get-all-server-types)
             * [Get all server types by name](#get-all-server-types-by-name)
             * [Get a server type by id](#get-server-type-by-id)
+    * [SSH Keys](#ssh-keys)
+        * [Top level actions](#ssh-keys-top-level-actions)
+            * [Create SSH key](#create-ssh-key)
+            * [Get all SSH keys](#get-all-ssh-keys)
+            * [Get all SSH keys by name](#get-all-ssh-keys-by-name)
+            * [Get SSH key by id](#get-ssh-key-by-id)
+        * [Modifier actions](#ssh-modifier-actions)
+            * [Delete SSH key](#delete-ssh-key)
+            * [Update SSH key](#update-ssh-key)
 
 ## State
 
@@ -219,6 +228,184 @@ A number of standard exceptions can be thrown from the methods that interact wit
 is not what was expected.
 * `HetznerInvalidArgumentException` - raised when a required argument of the method is not specified correctly. The
 exception will detail the failing parameter.
+
+### Datacenters
+
+#### Top level actions
+
+The datacenter top level action can be retrieved by calling the `datacenters()` method on the `HetznerCloudClient`
+instance.
+
+##### Get all datacenters
+
+To retrieve all of the datacenters available on the Hetzner Cloud service, simply call the `get_all()` method, passing
+in no parameters.
+
+*NOTE: This method returns a generator, so if you wish to get all of the results instantly, you should encapsulate the
+call within the `list()` function*
+
+```python
+all_dcs_generator = client.datacenters().get_all()
+for dc in all_dcs_generator:
+    print(dc.id)
+    
+all_dcs_list = list(client.datacenters().get_all())
+print(all_dcs_list)
+```
+
+##### Get all datacenters by name
+
+To get all datacenters filtered by a name, call the `get_all()` method with the name parameter populated.
+
+```python
+all_dcs = list(client.datacenters().get_all(name="fsn1-dc8"))
+print(all_dcs)
+```
+
+##### Get datacenter by id
+
+To get a datacenter by id, simply call the `get()` method on the datacenter action, passing in the id of the datacenter
+you wish to get information for.
+
+```python
+datacenter = client.datacenters().get(1)
+print(datacenter.name)
+```
+
+### Images
+
+#### Images top level actions
+
+##### Get all images
+
+To retrieve all of the images available on the Hetzner Cloud service, simply call the `get_all()` method, passing
+in no parameters.
+
+There are also a number of parameters on this method that allow you to filter and sort images.
+
+```python
+images = client.images().get_all(sort=SORT_BY_ID_ASC)
+for image in images:
+    print(image.id)
+```
+
+##### Get image by id
+
+To get an image by its id, simply call the `get()` method, passing in the id of the image you wish to retrieve.
+
+```python
+image = client.images().get(1)
+print(image.id)
+```
+
+#### Images modifier actions
+
+##### Update image
+
+To update an image's description or type, call the `update()` method with the description of the image and/or the type
+of the image, should you wish to update them. Both parameters are optional.
+
+```python
+image = client.images().get(1)
+image.update(description="my description", type=IMAGE_TYPE_SNAPSHOT)
+```
+
+##### Delete image
+
+To delete an image, call the `delete()` method. NOTE: Only images of type 'snapshot' or 'backup' can be deleted (so,
+you cannot delete the images provided by Hetzner!).
+
+```python
+image = list(client.images().get_all(name="my-first-image"))[0]
+image.delete()
+```
+
+### ISOs
+
+#### Top level actions
+
+The iso top level action can be retrieved by calling the `isos()` method on the `HetznerCloudClient`
+instance.
+
+##### Get all ISOs
+
+To retrieve all of the isos available on the Hetzner Cloud service, simply call the `get_all()` method, passing
+in no parameters.
+
+*NOTE: This method returns a generator, so if you wish to get all of the results instantly, you should encapsulate the
+call within the `list()` function*
+
+```python
+isos = client.isos().get_all()
+for l in isos:
+    print(l.id)
+    
+isos = list(client.isos().get_all())
+print(isos)
+```
+
+##### Get all ISOs by name
+
+To get all isos filtered by a name, call the `get_all()` method with the name parameter populated.
+
+```python
+isos = list(client.isos().get_all(name="virtio-win-0.1.141.iso"))
+print(isos)
+```
+
+##### Get ISO by id
+
+To get an iso by id, simply call the `get()` method on the datacenter action, passing in the id of the iso
+you wish to get information for.
+
+```python
+iso = client.isos().get(1)
+print(iso.name)
+```
+
+### Locations
+
+#### Top level actions
+
+The location top level action can be retrieved by calling the `locations()` method on the `HetznerCloudClient`
+instance.
+
+##### Get all locations
+
+To retrieve all of the locations available on the Hetzner Cloud service, simply call the `get_all()` method, passing
+in no parameters.
+
+*NOTE: This method returns a generator, so if you wish to get all of the results instantly, you should encapsulate the
+call within the `list()` function*
+
+```python
+all_locs_generator = client.locations().get_all()
+for l in all_locs_generator:
+    print(l.id)
+    
+all_locs_list = list(client.locations().get_all())
+print(all_locs_list)
+```
+
+##### Get all locations by name
+
+To get all locations filtered by a name, call the `get_all()` method with the name parameter populated.
+
+```python
+all_locs = list(client.locations().get_all(name="fsn1"))
+print(all_locs)
+```
+
+##### Get location by id
+
+To get a location by id, simply call the `get()` method on the datacenter action, passing in the id of the location
+you wish to get information for.
+
+```python
+location = client.locations().get(1)
+print(location.name)
+```
+
 
 ### Servers
 
@@ -510,183 +697,6 @@ except HetznerWaitAttemptsExceededException:
 This method throws a `HetznerWaitAttemptsExceededException` should the amount of attempts be exceeded with the condition
 still being unmet.
 
-### Datacenters
-
-#### Top level actions
-
-The datacenter top level action can be retrieved by calling the `datacenters()` method on the `HetznerCloudClient`
-instance.
-
-##### Get all datacenters
-
-To retrieve all of the datacenters available on the Hetzner Cloud service, simply call the `get_all()` method, passing
-in no parameters.
-
-*NOTE: This method returns a generator, so if you wish to get all of the results instantly, you should encapsulate the
-call within the `list()` function*
-
-```python
-all_dcs_generator = client.datacenters().get_all()
-for dc in all_dcs_generator:
-    print(dc.id)
-    
-all_dcs_list = list(client.datacenters().get_all())
-print(all_dcs_list)
-```
-
-##### Get all datacenters by name
-
-To get all datacenters filtered by a name, call the `get_all()` method with the name parameter populated.
-
-```python
-all_dcs = list(client.datacenters().get_all(name="fsn1-dc8"))
-print(all_dcs)
-```
-
-##### Get datacenter by id
-
-To get a datacenter by id, simply call the `get()` method on the datacenter action, passing in the id of the datacenter
-you wish to get information for.
-
-```python
-datacenter = client.datacenters().get(1)
-print(datacenter.name)
-```
-
-### Images
-
-#### Images top level actions
-
-##### Get all images
-
-To retrieve all of the images available on the Hetzner Cloud service, simply call the `get_all()` method, passing
-in no parameters.
-
-There are also a number of parameters on this method that allow you to filter and sort images.
-
-```python
-images = client.images().get_all(sort=SORT_BY_ID_ASC)
-for image in images:
-    print(image.id)
-```
-
-##### Get image by id
-
-To get an image by its id, simply call the `get()` method, passing in the id of the image you wish to retrieve.
-
-```python
-image = client.images().get(1)
-print(image.id)
-```
-
-#### Images modifier actions
-
-##### Update image
-
-To update an image's description or type, call the `update()` method with the description of the image and/or the type
-of the image, should you wish to update them. Both parameters are optional.
-
-```python
-image = client.images().get(1)
-image.update(description="my description", type=IMAGE_TYPE_SNAPSHOT)
-```
-
-##### Delete image
-
-To delete an image, call the `delete()` method. NOTE: Only images of type 'snapshot' or 'backup' can be deleted (so,
-you cannot delete the images provided by Hetzner!).
-
-```python
-image = list(client.images().get_all(name="my-first-image"))[0]
-image.delete()
-```
-
-### ISOs
-
-#### Top level actions
-
-The iso top level action can be retrieved by calling the `isos()` method on the `HetznerCloudClient`
-instance.
-
-##### Get all ISOs
-
-To retrieve all of the isos available on the Hetzner Cloud service, simply call the `get_all()` method, passing
-in no parameters.
-
-*NOTE: This method returns a generator, so if you wish to get all of the results instantly, you should encapsulate the
-call within the `list()` function*
-
-```python
-isos = client.isos().get_all()
-for l in isos:
-    print(l.id)
-    
-isos = list(client.isos().get_all())
-print(isos)
-```
-
-##### Get all ISOs by name
-
-To get all isos filtered by a name, call the `get_all()` method with the name parameter populated.
-
-```python
-isos = list(client.isos().get_all(name="virtio-win-0.1.141.iso"))
-print(isos)
-```
-
-##### Get ISO by id
-
-To get an iso by id, simply call the `get()` method on the datacenter action, passing in the id of the iso
-you wish to get information for.
-
-```python
-iso = client.isos().get(1)
-print(iso.name)
-```
-
-### Locations
-
-#### Top level actions
-
-The location top level action can be retrieved by calling the `locations()` method on the `HetznerCloudClient`
-instance.
-
-##### Get all locations
-
-To retrieve all of the locations available on the Hetzner Cloud service, simply call the `get_all()` method, passing
-in no parameters.
-
-*NOTE: This method returns a generator, so if you wish to get all of the results instantly, you should encapsulate the
-call within the `list()` function*
-
-```python
-all_locs_generator = client.locations().get_all()
-for l in all_locs_generator:
-    print(l.id)
-    
-all_locs_list = list(client.locations().get_all())
-print(all_locs_list)
-```
-
-##### Get all locations by name
-
-To get all locations filtered by a name, call the `get_all()` method with the name parameter populated.
-
-```python
-all_locs = list(client.locations().get_all(name="fsn1"))
-print(all_locs)
-```
-
-##### Get location by id
-
-To get a location by id, simply call the `get()` method on the datacenter action, passing in the id of the location
-you wish to get information for.
-
-```python
-location = client.locations().get(1)
-print(location.name)
-```
-
 ### Server size types
 
 #### Top level actions
@@ -728,4 +738,66 @@ you wish to get information for.
 ```python
 stype = client.server_types().get(1)
 print(stype.name)
+```
+
+### SSH keys
+
+#### SSH keys top level actions
+
+##### Create SSH key
+
+To create an SSH key, call the `create()` method on the `HetznerCloudSSHKeysAction` with the name and the public key of
+the SSH key you wish to add.
+
+```python
+new_ssh_key = client.ssh_keys().create(name="My new SSH key", public_key="abcdef")
+print(new_ssh_key.fingerprint)
+```
+
+##### Get all SSH keys
+
+To get all SSH keys, call the `get_all()` method. NOTE: This object returned from this method is a generator.
+
+```python
+ssh_keys = client.ssh_keys().get_all()
+for ssh_key in ssh_keys:
+    print(ssh_key.id)
+```
+
+##### Get all SSH keys by name
+
+To get all SSH keys by their name, call the `get_all()` method, but pass in the name of the SSH key you wish to search
+for. 
+
+```python
+ssh_keys = list(client.ssh_keys().get_all(name="My SSH key"))
+for ssh_key in ssh_keys:
+    print(ssh_key.id)
+```
+
+##### Get SSH key by id
+
+```python
+ssh_key = client.ssh_keys().get(1)
+print(ssh_key.id)
+```
+
+#### SSH keys modifier actions
+
+##### Delete SSH key
+
+To delete an SSH key, call the `delete()` method on the SSH key object.
+
+```python
+ssh_key = client.ssh_keys().get(1)
+ssh_key.delete()
+```
+
+##### Update SSH key
+
+To update an SSH key's name, call the `update()` method on the SSH key object.
+
+```python
+ssh_key = client.ssh_keys().get(1)
+ssh_key.update(name="Foo")
 ```
