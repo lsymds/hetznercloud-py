@@ -23,14 +23,14 @@ class HetznerCloudImagesAction(object):
             raise HetznerActionException(results)
 
         for result in results["images"]:
-            yield HetznerCloudImage._load_from_json(result)
+            yield HetznerCloudImage._load_from_json(self._config, result)
 
     def get(self, id):
         status_code, results = _get_results(self._config, "images/%s" % id)
         if status_code != 200:
             raise HetznerActionException(results)
 
-        return HetznerCloudImage._load_from_json(results["image"])
+        return HetznerCloudImage._load_from_json(self._config, results["image"])
 
 
 class HetznerCloudImage(object):
