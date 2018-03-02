@@ -1,0 +1,14 @@
+language: python
+python:
+  - 3.6
+env:
+  secure: "Ntp8u8TsUVC3ZtAggnCNzZsOEeOCxL6NGit6kt1Be/k6wD2FDaM1xhEBl7rF7KWO1pwrY1JgYve6S3UsxppGnhMWuX64AbfiUqBY9KCZ2zvtAFH2cQC/srrsF83KGurYfP9iiZnlc53KzAkTVbzoI97nQX9VgR/D48C7s6LwzpCoBG9B0JKJ25EbogIy2wWZKUErkhBaSnph8nvew8X76lekUlfiau88bAuSGFWBlR3NYraWzakB4N5IBK2YLBMcmBNh6XW1sbR3RZzwfHZMZYFrfPABjQnE1RS6tXkBoKS2VwtohOR1C2tQJF7T2sA/tv2zM+8lVFUlLwsmpHMUyl4kvpEw8QYjorVhv3zUl4tt8xbnQqNtswpae0vU/+LVh8PAIWAy2I0YTdaCFFOZWViMH03zFrl9vLwDoC8fH59RCFfc2wbKCkRCLXrVUXa9yHBKWk214OBvf36gXp2zir+fj22pTozhu7fjwJsLNn7a4ZddWUxd9/Z+p8JNK//RrECDANMTEb0eRGVQg1f/yExh7Yg8BBh1ZUyhO0DGj4sA9tq+cGjx/LX5dc2WJVgTUorSn1eW+fHkS6rAD34fpCNLdKm1e2ustwJj7nP3cHtEBs/eeqNELRbtx2LEI14iaxF9DMIaonnORxj/3mnwMxt2Ze5cbpl/Gqr627dA9y8="
+install:
+  - pip install -r requirements.txt
+script:
+  - echo $HNER_API_KEY
+  -  nosetests -v
+branches:
+  only:
+    - master
+    - develop

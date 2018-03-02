@@ -55,7 +55,7 @@ class HetznerCloudServersAction(object):
         return HetznerCloudServer._load_from_json(self._config, _get_server_json(self._config, server_id))
 
     def get_all(self, name=None):
-        results = _get_results(self._config, "servers", {"name": name} if name is not None else None)
+        _, results = _get_results(self._config, "servers", {"name": name} if name is not None else None)
         for result in results["servers"]:
             yield HetznerCloudServer._load_from_json(self._config, result)
 
