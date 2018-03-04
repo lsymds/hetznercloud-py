@@ -1,3 +1,4 @@
+from .floating_ips import HetznerCloudFloatingIpAction
 from .ssh_keys import HetznerCloudSSHKeysAction
 from .images import HetznerCloudImagesAction
 from .datacenters import HetznerCloudDatacentersAction
@@ -48,7 +49,7 @@ class HetznerCloudClient(object):
         return HetznerCloudDatacentersAction(self.configuration)
 
     def floating_ips(self):
-        pass
+        return HetznerCloudFloatingIpAction(self.configuration)
 
     def images(self):
         return HetznerCloudImagesAction(self.configuration)
