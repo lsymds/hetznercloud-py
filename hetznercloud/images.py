@@ -78,11 +78,11 @@ class HetznerCloudImage(object):
         image.status = json["status"]
         image.name = json["name"]
         image.description = json["description"]
-        image.image_size = float(json["image_size"])
-        image.disk_size = float(json["disk_size"])
-        image.created_from_id = int(json["created_from"]["id"])
-        image.created_from_name = json["created_from"]["name"]
-        image.bound_to = int(json["bound_to"])
+        image.image_size = float(json["image_size"]) if json["image_size"] is not None else None
+        image.disk_size = float(json["disk_size"]) if json["disk_size"] is not None else None
+        image.created_from_id = int(json["created_from"]["id"]) if json["created_from"] is not None else None
+        image.created_from_name = json["created_from"]["name"] if json["created_from"] is not None else None
+        image.bound_to = int(json["bound_to"]) if json["bound_to"] is not None else None
         image.os_flavor = json["os_flavor"]
         image.os_version = json["os_version"]
         image.rapid_deploy = bool(json["rapid_deploy"])

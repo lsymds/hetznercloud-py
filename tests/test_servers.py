@@ -106,14 +106,7 @@ class TestServers(BaseHetznerTest):
         action.wait_until_status_is(ACTION_STATUS_SUCCESS)
 
         action = created_server.change_type(SERVER_TYPE_2CPU_4GB, False)
-        print(action)
-        action.wait_until_status_is(ACTION_STATUS_SUCCESS)
         self.assertEqual(created_server.server_type, SERVER_TYPE_2CPU_4GB)
-
-        action = created_server.change_type(SERVER_TYPE_1CPU_2GB, False)
-        print(action)
-        action.wait_until_status_is(ACTION_STATUS_SUCCESS)
-        self.assertEqual(created_server.server_type, SERVER_TYPE_1CPU_2GB)
 
     def test_can_power_off_a_server(self):
         created_server, _ = self.create_server("test-can-power-off-server")

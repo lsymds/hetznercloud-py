@@ -25,6 +25,9 @@ def _get_results(config, endpoint, url_params=None, body=None, method="GET"):
     if request.status_code == 500:
         raise HetznerInternalServerErrorException(request.text)
 
+    if not request.text:
+        return request.status_code, ""
+
     js = request.json()
     if "action" in js and "error" in js["action"] and js["action"]["error"] is not None:
         raise HetznerActionException(js["action"]["error"])
