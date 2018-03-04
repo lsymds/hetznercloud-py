@@ -25,6 +25,17 @@ A Python SDK for the new (and wonderful) Hetzner cloud service.
             * [Get all datacenters](#get-all-datacenters)
             * [Get all datacenters by name](#get-all-datacenters-by-name)
             * [Get a datacenter by id](#get-datacenter-by-id)
+    * [Floating IPs](#floating-ips)
+        * [Top level actions](#floating-ips-top-level-actions)
+            * [Create](#create-floating-ip)
+            * [Get all floating IPs](#get-all-floating-ips)
+            * [Get floating IPs by id](#get-floating-ip-by-id)
+        * [Modifier actions](#floating-ips-modifier-actions)
+            * [Assign to server](#assign-floating-ip-to-server)
+            * [Change description](#change-floating-ip-description)
+            * [Change reverse DNS entry](#change-floating-ip-reverse-dns-entry)
+            * [Delete floating IP](#delete-floating-ip)
+            * [Unassign from server](#unassign-floating-ip-from-server)
     * [Images](#images)
         * [Top level actions](#images-top-level-actions)
             * [Get all images](#get-all-images)
@@ -200,6 +211,13 @@ Constants that represent backup windows.
 * `BACKUP_WINDOW_2PM_6PM` - Backup window between 2PM and 6PM
 * `BACKUP_WINDOW_6PM_10PM` - Backup window between 6PM and 10PM
 
+##### Floating IP types
+
+Constants that represent floating IP types
+
+* `FLOATING_IP_TYPE_IPv4` - IPv4 floating IP
+* `FLOATING_IP_TYPE_IPv6` - IPv6 floating IP
+
 ##### Image types
 
 Constants that represent image types.
@@ -270,6 +288,82 @@ you wish to get information for.
 ```python
 datacenter = client.datacenters().get(1)
 print(datacenter.name)
+```
+
+### Floating IPs
+
+#### Floating IPs top level actions
+
+##### Create floating IP
+
+To create a floating IP, simply call the `create()` method with the parameters detailed below. 
+
+*NOTE: If you do not specify `server`, then you must specify `home_location`, or vice versa.*
+
+```python
+new_floating_ip = client.floating_ips().create(type=FLOATING_IP_TYPE_IPv4,
+    server=42,
+    description="My new floating IP")
+    
+" or...
+ 
+new_floating_ip = client.floating_ips().create(type=FLOATING_IP_TYPE_IPv4,
+    home_location="fep1",
+    description="My new floating IP")
+```
+
+##### Get all floating IPs
+
+```python
+floating_ips = client.floating_ips().get_all()
+for ip in floating_ips:
+    print(ip.id)
+```
+
+##### Get floating IP by id
+
+```python
+floating_ip = client.floating_ips().get(1)
+print(floating_ip.id)
+```
+
+#### Floating IPs modifier actions
+
+##### Assign floating IP to server
+
+```python
+floating_ip = client.floating_ips().get(1)
+action = floating_ip.assign_to_server(2)
+action.wait_until_status_is(ACTION_STATUS_RUNNING)
+```
+
+##### Change floating IP description
+
+```python
+floating_ip = client.floating_ips().get(1)
+floating_ip.change_description("My new floating IP v2")
+```
+
+##### Change floating IP reverse DNS entry
+
+```python
+floating_ip = client.floating_ips().get(1)
+action = floating_ip.change_reverse_dns_entry("192.168.1.1", "www.google.com")
+action.wait_until_status_is(ACTION_STATUS_SUCCESS)
+```
+
+##### Delete floating IP
+
+```python
+floating_ip = client.floating_ips().get(1)
+floating_ip.delete()
+```
+
+##### Unassign floating IP from server
+
+```python
+floating_ip = client.floating_ips().get(1)
+floating_ip.unassign_from_server()
 ```
 
 ### Images

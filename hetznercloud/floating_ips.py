@@ -58,13 +58,13 @@ class HetznerCloudFloatingIp(object):
     def change_description(self, new_description):
         pass
 
-    def change_reverse_dns_entry(self, new_reverse_dns_entry):
+    def change_reverse_dns_entry(self, ip, dns_ptr):
         pass
 
     def delete(self):
         pass
 
-    def unassign(self):
+    def unassign_from_server(self):
         pass
 
     @staticmethod

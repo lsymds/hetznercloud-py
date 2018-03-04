@@ -51,3 +51,6 @@ SORT_BY_NAME_ASC = "name:asc"
 SORT_BY_NAME_DESC = "name:desc"
 SORT_BY_CREATED_ASC = "created:asc"
 SORT_BY_CREATED_DESC = "created:desc"
+
+FLOATING_IP_TYPE_IPv4 = "ipv4"
+FLOATING_IP_TYPE_IPv6 = "ipv6"
