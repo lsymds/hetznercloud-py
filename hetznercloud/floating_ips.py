@@ -1,5 +1,5 @@
-from hetznercloud import HetznerInvalidArgumentException, HetznerActionException
-from hetznercloud.shared import _get_results
+from .exceptions import HetznerInvalidArgumentException, HetznerActionException
+from .shared import _get_results
 
 
 class HetznerCloudFloatingIpAction(object):
@@ -20,7 +20,7 @@ class HetznerCloudFloatingIpAction(object):
 
         status_code, results = _get_results(self._config, "floating_ips", method="POST", body=body)
         if status_code != 201:
-            return HetznerActionException(results)
+            raise HetznerActionException(results)
 
         return HetznerCloudFloatingIp._load_from_json(self._config, results["floating_ip"])
 
@@ -53,19 +53,47 @@ class HetznerCloudFloatingIp(object):
         self.blocked = False
 
     def assign_to_server(self, server_id):
-        pass
+        if not server_id:
+            raise HetznerInvalidArgumentException("server_id")
+
+        status_code, result = _get_results(self._config, "floating_ips/%s/actions/assign" % self.id, method="POST",
+                                           url_params={"server": server_id})
+        if status_code != 200:
+            raise HetznerActionException(result)
+
+        self.server = server_id
 
     def change_description(self, new_description):
-        pass
+        status_code, result = _get_results(self._config, "floating_ips/%s" % self.id, method="PUT",
+                                           body={"description": new_description})
+        if status_code != 200:
+            raise HetznerActionException(result)
 
-    def change_reverse_dns_entry(self, ip, dns_ptr):
-        pass
+        self.description = new_description
+
+    def change_reverse_dns_entry(self, ip, dns_ptr=None):
+        if not ip:
+            raise HetznerInvalidArgumentException("ip")
+
+        status_code, result = _get_results(self._config, "floating_ips/%s/actions/change_dns_ptr" % self.id,
+                                           method="POST", body={"ip": ip, "dns_ptr": dns_ptr})
+        if status_code != 201:
+            raise HetznerActionException(result)
+
+        self.ptr_ips = [ip]
+        self.ptr_dns_ptrs = [dns_ptr]
 
     def delete(self):
-        pass
+        status_code, result = _get_results(self._config, "floating_ips/%s" % self.id, method="DELETE")
+        if status_code != 204:
+            raise HetznerActionException(result)
 
     def unassign_from_server(self):
-        pass
+        status_code, result = _get_results(self._config, "floating_ips/%s/actions/unassign" % self.id, method="POST")
+        if status_code != 200:
+            raise HetznerActionException(result)
+
+        self.server = 0
 
     @staticmethod
     def _load_from_json(config, json):
@@ -74,7 +102,7 @@ class HetznerCloudFloatingIp(object):
         float_ip.id = int(json["id"])
         float_ip.description = json["description"]
         float_ip.type = json["type"]
-        float_ip.server = int(json["server"])
+        float_ip.server = int(json["server"]) if json["server"] is not None else 0
         float_ip.ptr_ips = [entry["ip"] for entry in json["dns_ptr"]]
         float_ip.ptr_dns_ptrs = [entry["dns_ptr"] for entry in json["dns_ptr"]]
         float_ip.location_id = int(json["home_location"]["id"])
