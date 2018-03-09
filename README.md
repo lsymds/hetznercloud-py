@@ -341,7 +341,7 @@ action.wait_until_status_is(ACTION_STATUS_RUNNING)
 
 ```python
 floating_ip = client.floating_ips().get(1)
-floating_ip.change_description("My new floating IP v2")
+action = floating_ip.change_description("My new floating IP v2")
 ```
 
 ##### Change floating IP reverse DNS entry
@@ -356,14 +356,14 @@ action.wait_until_status_is(ACTION_STATUS_SUCCESS)
 
 ```python
 floating_ip = client.floating_ips().get(1)
-floating_ip.delete()
+action = floating_ip.delete()
 ```
 
 ##### Unassign floating IP from server
 
 ```python
 floating_ip = client.floating_ips().get(1)
-floating_ip.unassign_from_server()
+action = floating_ip.unassign_from_server()
 ```
 
 ### Images
