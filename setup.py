@@ -1,4 +1,4 @@
-from distutils.core import setup
+from setuptools import setup
 
 setup(
     name="hetznercloud",
@@ -9,5 +9,6 @@ setup(
     author_email="liam@ls-software.uk",
     url="https://github.com/elsyms/hetznercloud-py",
     keywords=["hetzner", "hetznercloud", "hetzner cloud api", "hetzner sdk", "hetzner api"],
-    classifiers=[]
+    classifiers=[],
+    install_requires=["requests==2.18.4"]
 )
