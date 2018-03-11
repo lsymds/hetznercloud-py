@@ -4,7 +4,6 @@
 
 A Python SDK for the new (and wonderful) Hetzner cloud service.
 
-* [State](#state)
 * [Contributing](#contributing)
 * [Usage](#documentation)
     * [Installation](#installation)
@@ -91,11 +90,6 @@ A Python SDK for the new (and wonderful) Hetzner cloud service.
         * [Modifier actions](#ssh-modifier-actions)
             * [Delete SSH key](#delete-ssh-key)
             * [Update SSH key](#update-ssh-key)
-
-## State
-
-The SDK is currently under development. Please switch to the develop branch of this project if you wish to see the 
-progress made on it so far. 
 
 ## Contributing
 
