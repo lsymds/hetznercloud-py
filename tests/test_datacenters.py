@@ -21,3 +21,11 @@ class TestDatacenters(BaseHetznerTest):
         self.assertIsNotNone(dc.location)
         self.assertTrue(len(dc.available_server_types) > 0)
         self.assertTrue(len(dc.supported_server_types) > 0)
+
+    def test_can_get_all_datacenters_alias(self):
+        """
+        Basic test for the datacenters alias method.
+        """
+        dcs = list(self.client.datacenters().get_all())
+        self.assertIsNotNone(dcs)
+        self.assertTrue(len(dcs) > 0)

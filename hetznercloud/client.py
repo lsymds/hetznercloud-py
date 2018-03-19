@@ -45,6 +45,9 @@ class HetznerCloudClient(object):
 
         self.configuration = configuration
 
+        # alias for datacentres method
+        self.datacenters = self.datacentres
+
     def datacentres(self):
         return HetznerCloudDatacentersAction(self.configuration)
 
