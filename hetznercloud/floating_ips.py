@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from hetznercloud.actions import HetznerCloudAction
 from .exceptions import HetznerInvalidArgumentException, HetznerActionException
 from .shared import _get_results

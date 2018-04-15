@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from .floating_ips import HetznerCloudFloatingIpAction
 from .ssh_keys import HetznerCloudSSHKeysAction
 from .images import HetznerCloudImagesAction

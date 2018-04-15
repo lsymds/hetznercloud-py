@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from hetznercloud import FLOATING_IP_TYPE_IPv4, SERVER_STATUS_RUNNING
 from tests.base import BaseHetznerTest
 
