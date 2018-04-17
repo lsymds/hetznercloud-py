@@ -10,14 +10,16 @@ def _get_results(config, endpoint, url_params=None, body=None, method="GET"):
 
     headers = {"Authorization": "Bearer %s" % config.api_key}
 
+    data = json.dumps(body) if body is not None else None
+
     if method == "GET":
         request = requests.get(api, headers=headers, params=url_params)
     elif method == "POST" or (method == "GET" and body is not None):
-        request = requests.post(api, data=json.dumps(body), headers=headers, params=url_params)
+        request = requests.post(api, data=data, headers=headers, params=url_params)
     elif method == "DELETE":
         request = requests.delete(api, headers=headers)
     elif method == "PUT":
-        request = requests.put(api, headers=headers, data=json.dumps(body))
+        request = requests.put(api, headers=headers, data=data)
 
     if request.status_code == 401 or request.status_code == 403:
         raise HetznerAuthenticationException()
