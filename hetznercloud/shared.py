@@ -2,7 +2,7 @@ import json
 
 import requests
 
-from .exceptions import HetznerAuthenticationException, HetznerInternalServerErrorException, HetznerActionException
+from .exceptions import HetznerAuthenticationException, HetznerInternalServerErrorException, HetznerActionException, HetznerRateLimitExceeded
 
 
 def _get_results(config, endpoint, url_params=None, body=None, method="GET"):
@@ -21,6 +21,9 @@ def _get_results(config, endpoint, url_params=None, body=None, method="GET"):
 
     if request.status_code == 401 or request.status_code == 403:
         raise HetznerAuthenticationException()
+
+    if request.status_code == 429:
+        raise HetznerRateLimitExceeded()
 
     if request.status_code == 500:
         raise HetznerInternalServerErrorException(request.text)
