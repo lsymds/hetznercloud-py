@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import time
 
 from .constants import ACTION_STATUS_ERROR
@@ -42,7 +43,7 @@ class HetznerCloudAction(object):
         if self.status == status:
             return
 
-        for i in range(0, attempts):
+        for i in xrange(0, attempts):
             action_status = _get_action_json(self.config, self.id)
             if action_status["status"] == status:
                 self.status = action_status

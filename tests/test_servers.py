@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from hetznercloud import SERVER_STATUS_OFF, ACTION_STATUS_SUCCESS, SERVER_STATUS_RUNNING, \
     BACKUP_WINDOW_10PM_2AM, HetznerActionException, SERVER_TYPE_2CPU_4GB, SERVER_TYPE_1CPU_2GB, IMAGE_UBUNTU_1604
 from tests.base import BaseHetznerTest

@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import unittest
 
 from hetznercloud import HetznerCloudClient, SERVER_TYPE_1CPU_2GB, IMAGE_UBUNTU_1604, FLOATING_IP_TYPE_IPv4

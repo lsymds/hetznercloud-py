@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import time
 
 from .actions import HetznerCloudAction
@@ -277,7 +278,7 @@ class HetznerCloudServer(object):
         if self.status == status:
             return
 
-        for i in range(0, attempts):
+        for i in xrange(0, attempts):
             server_status = _get_server_json(self._config, self.id)["status"]
             if server_status == status:
                 self.status = server_status

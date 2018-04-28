@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from .exceptions import HetznerActionException
 from .shared import _get_results
 

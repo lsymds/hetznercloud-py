@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import unittest
 
 from hetznercloud import HetznerCloudClientConfiguration, HetznerCloudClient, HetznerConfigurationException
