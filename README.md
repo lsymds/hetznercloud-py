@@ -193,6 +193,7 @@ Constants that represent the datacentres available to users.
 
 * `DATACENTER_FALKENSTEIN_1` - Falkenstein 1 DC 8
 * `DATACENTER_NUREMBERG_1` - Nuremberg 1 DC 3
+* `DATACENTER_HELSINKI_1` - Helsinki 1 DC 2
 
 ##### Backup windows
 
