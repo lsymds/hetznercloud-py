@@ -15,7 +15,7 @@ A Python SDK for the new (and wonderful) Hetzner cloud service.
             * [Action statuses](#action-statuses)
             * [Server types](#server-types)
             * [Images](#image-types)
-            * [Datacentres](#datacentre-constants)
+            * [Datacenters](#datacenter-constants)
             * [Backup windows](#backup-windows)
             * [Image types](#image-types)
             * [Image sorts](#image-sorts)
