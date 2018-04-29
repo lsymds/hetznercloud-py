@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Build Status](https://travis-ci.org/elsyms/hetznercloud-py.svg?branch=develop)](https://travis-ci.org/elsyms/hetznercloud-py) 
 
-A Python SDK for the new (and wonderful) Hetzner cloud service.
+A Python 3 SDK for the new (and wonderful) Hetzner cloud service.
 
 * [Contributing](#contributing)
 * [Usage](#documentation)

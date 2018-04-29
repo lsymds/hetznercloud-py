@@ -13,6 +13,9 @@ def _get_server_json(config, server_id):
     if status_code == 404:
         raise HetznerServerNotFoundException()
 
+    if not "server" in result:
+        raise HetznerActionException(result)
+
     return result["server"]
 
 
@@ -41,9 +44,9 @@ class HetznerCloudServersAction(object):
         if user_data is not None:
             create_params["user_data"] = user_data
 
-        _, result = _get_results(self._config, "servers", body=create_params, method="POST")
-        if result is None or ("error" in result and result["error"] is not None):
-            raise HetznerActionException(result["error"] if result is not None else None)
+        status_code, result = _get_results(self._config, "servers", body=create_params, method="POST")
+        if status_code != 201 or result is None or ("error" in result and result["error"] is not None):
+            raise HetznerActionException(result)
 
         return HetznerCloudServer._load_from_json(self._config, result["server"], result["root_password"]), \
                HetznerCloudAction._load_from_json(self._config, result["action"])
@@ -55,7 +58,10 @@ class HetznerCloudServersAction(object):
         return HetznerCloudServer._load_from_json(self._config, _get_server_json(self._config, server_id))
 
     def get_all(self, name=None):
-        _, results = _get_results(self._config, "servers", {"name": name} if name is not None else None)
+        status_code, results = _get_results(self._config, "servers", {"name": name} if name is not None else None)
+        if status_code != 200:
+            raise HetznerActionException(results)
+        
         for result in results["servers"]:
             yield HetznerCloudServer._load_from_json(self._config, result)
 
