@@ -23,7 +23,7 @@ class HetznerCloudServersAction(object):
     def __init__(self, config):
         self._config = config
 
-    def create(self, name, server_type, image, datacenter=None, start_after_create=True, ssh_keys=[], user_data=None):
+    def create(self, name, server_type, image, location=None, datacenter=None, start_after_create=True, ssh_keys=[], user_data=None):
         if not name or not server_type or not image:
             raise HetznerInvalidArgumentException("name" if not name
                                                   else "server_type" if not server_type
@@ -37,6 +37,8 @@ class HetznerCloudServersAction(object):
             "start_after_create": start_after_create
         }
 
+        if location is not None:
+            create_params["location"] = location
         if datacenter is not None:
             create_params["datacenter"] = datacenter
         if ssh_keys is not None and len(ssh_keys) > 0:
