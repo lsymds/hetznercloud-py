@@ -5,6 +5,7 @@
 A Python SDK for the new (and wonderful) Hetzner cloud service.
 
 * [Contributing](#contributing)
+* [Changelog](#changelog)
 * [Usage](#documentation)
     * [Installation](#installation)
     * [Getting started](#getting-started)
@@ -95,6 +96,17 @@ A Python SDK for the new (and wonderful) Hetzner cloud service.
 
 Open source contributions are more than welcome to be submitted to this repository and every issue and pull request will be
 promptly reviewed and evaluated on its suitability to be merged into the main branches. 
+
+## Changelog
+
+### v1.0.2
+
+* Updated the README to show supported Python version and this changelog section. 
+* Fixed an issue with status codes returned from server actions.
+* Fixed an issue where the body is null when sending a POST request.
+* Added the new Helsinki DC as a constant.
+* Added a check to the shared API requestor that checks for the 429 rate limited status code and returns a suitable exception.
+* Added an alias for datacenters, as my Britishness got the best of me when creating this library.
 
 ## Documentation
 
