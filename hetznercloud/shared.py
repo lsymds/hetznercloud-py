@@ -7,9 +7,7 @@ from .exceptions import HetznerAuthenticationException, HetznerInternalServerErr
 
 def _get_results(config, endpoint, url_params=None, body=None, method="GET"):
     api = "https://api.hetzner.cloud/v%s/%s?" % (config.api_version, endpoint)
-
     headers = {"Authorization": "Bearer %s" % config.api_key}
-
     data = json.dumps(body) if body is not None else None
 
     if method == "GET":

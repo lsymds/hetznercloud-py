@@ -151,4 +151,14 @@ class TestServers(BaseHetznerTest):
         pw, _ = created_server.reset_root_password()
         self.assertIsNotNone(pw)
 
+    def test_bad_response_code_results_in_an_exception_being_thrown(self):
+        created_server, _ = self.create_server("test-bad-response-code-results-in-an-exception-being-thrown")
+        created_server.wait_until_status_is(SERVER_STATUS_RUNNING)
+
+        try:
+            self.create_server("test-bad-response-code-results-in-an-exception-being-thrown")
+            self.fail()
+        except HetznerActionException:
+            pass
+
 
