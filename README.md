@@ -99,6 +99,10 @@ promptly reviewed and evaluated on its suitability to be merged into the main br
 
 ## Changelog
 
+### v1.0.3
+
+* Fixes an issue with the 8GB server constants having the wrong type. See [issue 15](https://github.com/elsyms/hetznercloud-py/issues/15)
+
 ### v1.0.2
 
 * Updated the README to show supported Python version and this changelog section. 

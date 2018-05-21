@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name="hetznercloud",
     packages=["hetznercloud"],
-    version="1.0.2",
+    version="1.0.3",
     description="Hetzner Cloud SDK",
     author="Liam Symonds",
     author_email="liam@ls-software.uk",
