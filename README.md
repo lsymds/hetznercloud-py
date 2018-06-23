@@ -99,6 +99,10 @@ promptly reviewed and evaluated on its suitability to be merged into the main br
 
 ## Changelog
 
+### v1.1.0
+
+* Allows new datacenters to be created in any datacenter in a selected location. See [pull request 16]().
+
 ### v1.0.4
 
 * Adds the new image type constants. See [pull request 17](https://github.com/elsyms/hetznercloud-py/pull/17).
