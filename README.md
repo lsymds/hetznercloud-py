@@ -101,7 +101,7 @@ promptly reviewed and evaluated on its suitability to be merged into the main br
 
 ### v1.1.0
 
-* Allows new datacenters to be created in any datacenter in a selected location. See [pull request 16]().
+* Allows new servers to be created in any datacenter in a selected location. See [pull request 16]().
 
 ### v1.0.4
 
