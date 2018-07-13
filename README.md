@@ -568,7 +568,7 @@ To create a server, you can call the `create` top level action method. This meth
 are optional, some aren't).
 
 ```python
-server_a, create_action = client.servers().create(name="My required server name", # REQUIRED
+server_a, create_action = client.servers().create(name="my-required-server-name", # REQUIRED
     server_type=SERVER_TYPE_1CPU_2GB, # REQUIRED
     image=IMAGE_UBUNTU_1604, # REQUIRED
     datacenter=DATACENTER_FALKENSTEIN_1,
