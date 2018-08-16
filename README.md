@@ -202,6 +202,12 @@ Constants that represent the server types available to users.
 * `SERVER_TYPE_8CPU_32GB` - The largest type with 8 CPU cores, 32GB of RAM and a 240GB SSD disk.
 * `SERVER_TYPE_8CPU_32GB_CEPH` - The same as above but with a 240GB CEPH network-attached disk.
 
+* `SERVER_TYPE_2CPU_8GB_DEDICATED_VCPU` - 2 dedicated CPU cores, 8GB of RAM and 80GB SSD disk.
+* `SERVER_TYPE_4CPU_16GB_DEDICATED_VCPU` - 4 dedicated CPU cores, 16GB of RAM and 160GB SSD disk.
+* `SERVER_TYPE_8CPU_32GB_DEDICATED_VCPU` - 8 dedicated CPU cores, 32GB of RAM and 240GB SSD disk.
+* `SERVER_TYPE_16CPU_64GB_DEDICATED_VCPU` - 16 dedicated CPU cores, 64GB of RAM and 360GB SSD disk.
+* `SERVER_TYPE_32CPU_128GB_DEDICATED_VCPU` - 32 dedicated CPU cores, 128GB of RAM and 540GB SSD disk.
+
 ##### Image types
 
 Constants that represent the standard images available to users.
