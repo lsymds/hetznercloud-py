@@ -207,9 +207,11 @@ Constants that represent the server types available to users.
 Constants that represent the standard images available to users.
 
 * `IMAGE_UBUNTU_1604` - Ubuntu 16.04 LTS
+* `IMAGE_UBUNTU_1804` - Ubuntu 18.04 LTS
 * `IMAGE_DEBIAN_9` - Debian 9.3
-* `IMAGE_CENTOS_7` - CentOS 7.4
+* `IMAGE_CENTOS_7` - CentOS 7.5
 * `IMAGE_FEDORA_27` - Fedora 27
+* `IMAGE_FEDORA_28` - Fedora 28
 
 ##### Datacentre constants
 
