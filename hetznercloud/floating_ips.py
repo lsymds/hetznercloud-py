@@ -45,6 +45,7 @@ class HetznerCloudFloatingIp(object):
     def __init__(self, config):
         self._config = config
         self.id = 0
+        self.ip = ""
         self.description = ""
         self.type = ""
         self.server = 0
@@ -108,6 +109,7 @@ class HetznerCloudFloatingIp(object):
 
         float_ip.id = int(json["id"])
         float_ip.description = json["description"]
+        float_ip.ip = json["ip"]
         float_ip.type = json["type"]
         float_ip.server = int(json["server"]) if json["server"] is not None else 0
         float_ip.ptr_ips = [entry["ip"] for entry in json["dns_ptr"]]
