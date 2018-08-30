@@ -574,9 +574,14 @@ server_a, create_action = client.servers().create(name="my-required-server-name"
     datacenter=DATACENTER_FALKENSTEIN_1,
     start_after_create=True,
     ssh_keys=["my-ssh-key-1", "my-ssh-key-2"],
-    user_data="rm -rf a-file")
+    user_data='''#cloud-config
+	packages:
+	 - screen
+	 - git
+    ''')
 server_a.wait_until_status_is(SERVER_STATUS_RUNNING) 
 ```
+For more details on user_data please see https://cloudinit.readthedocs.io/en/latest/topics/examples.html
 
 #### Server modifier actions
 
