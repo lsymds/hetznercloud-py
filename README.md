@@ -108,7 +108,7 @@ promptly reviewed and evaluated on its suitability to be merged into the main br
 
 ### v1.1.0
 
-* Allows new datacenters to be created in any datacenter in a selected location. See [pull request 16]().
+* Allows new servers to be created in any datacenter in a selected location. See [pull request 16]().
 
 ### v1.0.4
 
@@ -209,14 +209,23 @@ Constants that represent the server types available to users.
 * `SERVER_TYPE_8CPU_32GB` - The largest type with 8 CPU cores, 32GB of RAM and a 240GB SSD disk.
 * `SERVER_TYPE_8CPU_32GB_CEPH` - The same as above but with a 240GB CEPH network-attached disk.
 
+
+* `SERVER_TYPE_2CPU_8GB_DVCPU` - 2 dedicated CPU cores, 8GB of RAM and 80GB SSD disk.
+* `SERVER_TYPE_4CPU_16GB_DVCPU` - 4 dedicated CPU cores, 16GB of RAM and 160GB SSD disk.
+* `SERVER_TYPE_8CPU_32GB_DVCPU` - 8 dedicated CPU cores, 32GB of RAM and 240GB SSD disk.
+* `SERVER_TYPE_16CPU_64GB_DVCPU` - 16 dedicated CPU cores, 64GB of RAM and 360GB SSD disk.
+* `SERVER_TYPE_32CPU_128GB_DVCPU` - 32 dedicated CPU cores, 128GB of RAM and 540GB SSD disk.
+
 ##### Image types
 
 Constants that represent the standard images available to users.
 
 * `IMAGE_UBUNTU_1604` - Ubuntu 16.04 LTS
+* `IMAGE_UBUNTU_1804` - Ubuntu 18.04 LTS
 * `IMAGE_DEBIAN_9` - Debian 9.3
-* `IMAGE_CENTOS_7` - CentOS 7.4
+* `IMAGE_CENTOS_7` - CentOS 7.5
 * `IMAGE_FEDORA_27` - Fedora 27
+* `IMAGE_FEDORA_28` - Fedora 28
 
 ##### Datacentre constants
 
@@ -575,15 +584,20 @@ To create a server, you can call the `create` top level action method. This meth
 are optional, some aren't).
 
 ```python
-server_a, create_action = client.servers().create(name="My required server name", # REQUIRED
+server_a, create_action = client.servers().create(name="my-required-server-name", # REQUIRED
     server_type=SERVER_TYPE_1CPU_2GB, # REQUIRED
     image=IMAGE_UBUNTU_1604, # REQUIRED
     datacenter=DATACENTER_FALKENSTEIN_1,
     start_after_create=True,
     ssh_keys=["my-ssh-key-1", "my-ssh-key-2"],
-    user_data="rm -rf a-file")
+    user_data='''#cloud-config
+	packages:
+	 - screen
+	 - git
+    ''')
 server_a.wait_until_status_is(SERVER_STATUS_RUNNING) 
 ```
+For more details on user_data please see https://cloudinit.readthedocs.io/en/latest/topics/examples.html
 
 #### Server modifier actions
 
