@@ -1,6 +1,6 @@
 # Hetzner Cloud Python SDK
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Build Status](https://travis-ci.org/elsyms/hetznercloud-py.svg?branch=develop)](https://travis-ci.org/elsyms/hetznercloud-py) 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Build Status](https://travis-ci.org/thlisym/hetznercloud-py.svg?branch=develop)](https://travis-ci.org/elsyms/hetznercloud-py) 
 
 A Python 3 SDK for the new (and wonderful) Hetzner cloud service.
 
@@ -98,6 +98,13 @@ Open source contributions are more than welcome to be submitted to this reposito
 promptly reviewed and evaluated on its suitability to be merged into the main branches. 
 
 ## Changelog
+
+### v1.1.1
+
+* Adds new server type constants
+* Adds new image constants
+* Parses the IP field from the created floating IP API calls
+* Fixes the cloud-init documentation.
 
 ### v1.1.0
 
