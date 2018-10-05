@@ -1,4 +1,5 @@
-from .exceptions import HetznerInvalidArgumentException, HetznerActionException
+from .exceptions import HetznerInvalidArgumentException
+from .exceptions import HetznerActionException
 from .shared import _get_results
 
 

@@ -1,7 +1,8 @@
 import time
 
 from .constants import ACTION_STATUS_ERROR
-from .exceptions import HetznerWaitAttemptsExceededException, HetznerInternalServerErrorException
+from .exceptions import HetznerWaitAttemptsExceededException
+from .exceptions import HetznerInternalServerErrorException
 from .shared import _get_results
 
 
@@ -9,8 +10,10 @@ def _get_action_json(config, id):
     status_code, json = _get_results(config, "actions/%s" % id)
     return json["action"]
 
+
 class HetznerCloudActionsAction(object):
     pass
+
 
 class HetznerCloudAction(object):
     """
@@ -42,7 +45,7 @@ class HetznerCloudAction(object):
         if self.status == status:
             return
 
-        for i in range(0, attempts):
+        for _ in range(0, attempts):
             action_status = _get_action_json(self.config, self.id)
             if action_status["status"] == status:
                 self.status = action_status

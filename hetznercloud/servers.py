@@ -53,7 +53,7 @@ class HetznerCloudServersAction(object):
             raise HetznerActionException(result)
 
         return HetznerCloudServer._load_from_json(self._config, result["server"], result["root_password"]), \
-               HetznerCloudAction._load_from_json(self._config, result["action"])
+            HetznerCloudAction._load_from_json(self._config, result["action"])
 
     def get(self, server_id):
         if not isinstance(server_id, int) or server_id == 0:
@@ -287,7 +287,7 @@ class HetznerCloudServer(object):
         if self.status == status:
             return
 
-        for i in range(0, attempts):
+        for _ in range(0, attempts):
             server_status = _get_server_json(self._config, self.id)["status"]
             if server_status == status:
                 self.status = server_status

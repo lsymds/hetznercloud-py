@@ -36,5 +36,6 @@ class HetznerActionException(Exception):
 class HetznerWaitAttemptsExceededException(Exception):
     pass
 
+
 class HetznerRateLimitExceeded(Exception):
     pass

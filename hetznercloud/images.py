@@ -1,4 +1,3 @@
-from .constants import IMAGE_TYPE_SNAPSHOT
 from .exceptions import HetznerActionException
 from .shared import _get_results
 
