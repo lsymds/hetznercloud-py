@@ -66,7 +66,7 @@ class HetznerCloudImage(object):
 
     def delete(self):
         status_code, result = _get_results(self._config, "images/%s" % self.id, method="DELETE")
-        if status_code != 200:
+        if status_code != 204:
             raise HetznerActionException(result)
 
     @staticmethod

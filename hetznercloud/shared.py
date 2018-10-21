@@ -31,8 +31,11 @@ def _get_results(config, endpoint, url_params=None, body=None, method="GET"):
     if not request.text:
         return request.status_code, ""
 
-    js = request.json()
-    if "action" in js and "error" in js["action"] and js["action"]["error"] is not None:
-        raise HetznerActionException(js["action"]["error"])
-
-    return request.status_code, js
+    try:
+        js = request.json()
+        if "action" in js and "error" in js["action"] and js["action"]["error"] is not None:
+            raise HetznerActionException(js["action"]["error"])
+        
+        return request.status_code, js
+    except json.decoder.JSONDecodeError:
+        raise HetznerInternalServerErrorException("failed to deserialise JSON")
