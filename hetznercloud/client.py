@@ -7,6 +7,7 @@ from .isos import HetznerCloudIsosAction
 from .locations import HetznerCloudLocationsAction
 from .server_types import HetznerCloudServerTypesAction
 from .servers import HetznerCloudServersAction
+from .volumes import HetznerCloudVolumesAction
 
 
 class HetznerCloudClientConfiguration(object):
@@ -71,3 +72,6 @@ class HetznerCloudClient(object):
 
     def ssh_keys(self):
         return HetznerCloudSSHKeysAction(self.configuration)
+
+    def volumes(self):
+        return HetznerCloudVolumesAction(self.configuration)
