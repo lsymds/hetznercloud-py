@@ -1,7 +1,7 @@
 import time
 
 from .actions import HetznerCloudAction
-from .constants import VOLUME_FORMAT_XFS, VOLUME_FORMAT_EXT4
+from .constants import VOLUME_FORMAT_XFS, VOLUME_FORMAT_EXT4, VOLUME_MINIMUM_SIZE
 from .exceptions import HetznerInvalidArgumentException, HetznerActionException
 from .locations import HetznerCloudLocation
 from .shared import _get_results
@@ -19,7 +19,9 @@ class HetznerCloudVolumesAction(object):
     def __init__(self, config):
         self._config = config
 
-    def create(self, name, size, automount=False, format=None, location=None, server_id=None):
+    def create(self, name, size=VOLUME_MINIMUM_SIZE, automount=False, format=None, location=None, server_id=None):
+        if size < VOLUME_MINIMUM_SIZE:
+            raise HetznerInvalidArgumentException("size (%d) has to be greater than VOLUME_MINIMUM_SIZE (%d)" % (size, VOLUME_MINIMUM_SIZE))
         if location is None and server_id is None:
             raise HetznerInvalidArgumentException("location or server_id must be set")
         if automount and server_id is None:
@@ -103,7 +105,7 @@ class HetznerCloudVolume(object):
             raise HetznerInvalidArgumentException("size not set")
 
         if size <= self.size:
-            raise HetznerInvalidArgumentException("new size has to be greater than the current size")
+            raise HetznerInvalidArgumentException("new size (%d) has to be greater than the current size (%d)" % (size, self.size))
 
         status_code, result = _get_results(self._config, "volumes/%s/actions/resize" % self.id,
                                            method="POST", body={"size": size})

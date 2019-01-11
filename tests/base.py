@@ -32,5 +32,5 @@ class BaseHetznerTest(unittest.TestCase):
     def create_floating_ip(self, description):
         return self.client.floating_ips().create(FLOATING_IP_TYPE_IPv4, home_location=1, description=description)
 
-    def create_volume(self, name, size, automount=False, format=None, location=None, server_id=None):
-        return self.client.volumes().create(name, size, automount, format, location, server_id)
+    def create_volume(self, name, automount=False, format=None, location=None, server_id=None):
+        return self.client.volumes().create(name, automount=automount, format=format, location=location, server_id=server_id)
