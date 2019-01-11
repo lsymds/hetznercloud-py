@@ -91,6 +91,16 @@ A Python 3 SDK for the new (and wonderful) Hetzner cloud service.
         * [Modifier actions](#ssh-modifier-actions)
             * [Delete SSH key](#delete-ssh-key)
             * [Update SSH key](#update-ssh-key)
+    * [Volumes](#volumes)
+        * [Top level actions](#volumes-top-level-actions)
+            * [Create volume](#create-volume)
+            * [Get all volumes](#get-all-volumes)
+            * [Get volume by id](#get-volume-by-id)
+        * [Modifier actions](#volumes-modifier-actions)
+            * [Attach volume to server](#attach-volume-to-server)
+            * [Detach volume from server](#detach-volume-from-server)
+            * [Resize volume](#resize-volume)
+            * [Delete volume](#delete-volume)
 
 ## Contributing
 
@@ -98,6 +108,10 @@ Open source contributions are more than welcome to be submitted to this reposito
 promptly reviewed and evaluated on its suitability to be merged into the main branches. 
 
 ## Changelog
+
+### v1.x
+
+* Add volume support
 
 ### v1.1.1
 
@@ -270,6 +284,20 @@ Constants that define the different ways that images can be sorted.
 * `SORT_BY_NAME_DESC` - Sorts the images by their name in descending character order.
 * `SORT_BY_CREATED_ASC` - Sorts the images by their created date in ascending order.
 * `SORT_BY_CREATED_DESC` - Sorts the images by their created date in descending order.
+
+##### Volume statuses
+
+Constants that represent the different statuses for a volume.
+
+* `VOLUME_STATUS_CREATING` - The volume is currently being created.
+* `VOLUME_STATUS_AVAILABLE` - The volume is available.
+
+##### Volume formats
+
+Constants for volume formats.
+
+* `VOLUME_FORMAT_XFS` - Format a volume as XFS.
+* `VOLUME_FORMAT_EXT4` - Format a volume as ext4.
 
 #### Standard exceptions
 
@@ -750,7 +778,7 @@ image_id, image_action = server.image("My backup image", type=IMAGE_TYPE_BACKUP)
 image_action.wait_until_status_is(ACTION_STATUS_SUCCESS)
 
 print("The new backup image identifier is %s" % image_id)
-``` 
+```
 
 ##### Power on
 
@@ -934,4 +962,98 @@ To update an SSH key's name, call the `update()` method on the SSH key object.
 ```python
 ssh_key = client.ssh_keys().get(1)
 ssh_key.update(name="Foo")
+```
+
+### Volumes
+
+#### Volumes top level actions
+
+##### Create volume
+
+To create a volume, call the `create()` method on the `HetznerCloudVolumesAction` with the name and a location or a server id.
+
+If a location is given, the volume is left unattached:
+
+```python
+new_volume = client.volumes().create(name="newvol", location="nbg1")
+print(new_volume.id)
+```
+
+If a `server_id` is set, the volume is created in the location of the server and attached to it:
+
+```python
+new_volume = client.volumes().create(name="newvol", server_id=12345)
+print(new_volume.id)
+```
+
+If `size` is not specified `VOLUME_MINIMUM_SIZE` is used. Otherwise `size` is the size of the volume in GB:
+
+```python
+new_volume = client.volumes().create(name="newvol", size=15, location="nbg1")
+print(new_volume.id)
+```
+
+##### Get all volumes
+
+To get all volumes, call the `get_all()` method on `HetznerCloudVolumesAction`. NOTE: This object returned from this method is a generator.
+
+```python
+volumes = client.volumes().get_all()
+for volume in volumes:
+    print(volume.id)
+```
+
+##### Get volume by id
+
+```python
+volume = client.volumes().get(12345)
+print(volume.id)
+```
+
+#### Volumes modifier actions
+
+##### Attach volume to server
+
+To attach a volume to a server, call the `attach_to_server()` method with the server id on the volume object.
+
+```python
+volume = client.volumes().get(12345)
+action = volume.attach_to_server(54321)
+
+action.wait_until_status_is(ACTION_STATUS_SUCCESS)
+
+# continue
+```
+
+##### Detach volume from server
+
+To detach a volume from a server, call the `detach_from_server()` method on the volume object.
+
+```python
+volume = client.volumes().get(12345)
+action = volume.detach_from_server()
+
+action.wait_until_status_is(ACTION_STATUS_SUCCESS)
+
+# continue
+```
+
+##### Resize volume
+
+To resize a volume, call the `resize()` method with the new size on the volume object.
+
+```python
+volume = client.volumes().get(12345)
+volume.resize(20)
+```
+
+The new size has to be greater than the current size of the volume.
+
+##### Delete volume
+
+To delete a volume, call the `delete()` method on the volume object.
+
+```python
+volume = client.volumes().get(12345)
+volume.delete()
 ```
