@@ -100,6 +100,7 @@ A Python 3 SDK for the new (and wonderful) Hetzner cloud service.
             * [Attach volume to server](#attach-volume-to-server)
             * [Detach volume from server](#detach-volume-from-server)
             * [Resize volume](#resize-volume)
+            * [Update volume](#update-volume)
             * [Delete volume](#delete-volume)
 
 ## Contributing
@@ -1048,6 +1049,15 @@ volume.resize(20)
 ```
 
 The new size has to be greater than the current size of the volume.
+
+##### Update volume
+
+To update a volume, call the `update()` method with the new name on the volume object.
+
+```python
+volume = client.volumes().get(12345)
+volume.update("new-name")
+```
 
 ##### Delete volume
 

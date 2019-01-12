@@ -30,6 +30,15 @@ class TestVolumes(BaseHetznerTest):
 
         self.assertEqual(volume.size, VOLUME_MINIMUM_SIZE * 2)
 
+    def test_can_update_a_volume(self):
+        volume, action = self.create_volume(name = "test-can-update-a-volume", location = "nbg1")
+        action.wait_until_status_is(ACTION_STATUS_SUCCESS)
+
+        new_name = volume.name + "-updated"
+        volume.update(new_name)
+
+        self.assertEqual(volume.name, new_name)
+
     def test_can_attach_and_detach_a_volume_to_a_server(self):
         server, _ = self.create_server("test-can-attach-and-detach-a-volume-to-a-server")
         server.wait_until_status_is(SERVER_STATUS_RUNNING)

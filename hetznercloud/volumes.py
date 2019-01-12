@@ -116,6 +116,17 @@ class HetznerCloudVolume(object):
 
         return HetznerCloudAction._load_from_json(self._config, result["action"])
 
+    def update(self, name):
+        if not name or len(name) < 1:
+            raise HetznerInvalidArgumentException("name not set")
+
+        status_code, result = _get_results(self._config, "volumes/%s" % self.id,
+                                           method="PUT", body={"name": name})
+        if status_code != 200:
+            raise HetznerActionException(result)
+
+        self.name = name
+
     def delete(self):
         status_code, result = _get_results(self._config, "volumes/%s" % self.id, method="DELETE")
         if status_code != 204:
