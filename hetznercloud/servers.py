@@ -23,7 +23,7 @@ class HetznerCloudServersAction(object):
     def __init__(self, config):
         self._config = config
 
-    def create(self, name, server_type, image, datacenter=None, start_after_create=True, ssh_keys=[], user_data=None, location=None):
+    def create(self, name, server_type, image, datacenter=None, start_after_create=True, ssh_keys=[], user_data=None, location=None, volume_ids=[]):
         if not name or not server_type or not image:
             raise HetznerInvalidArgumentException("name" if not name
                                                   else "server_type" if not server_type
@@ -47,6 +47,8 @@ class HetznerCloudServersAction(object):
             create_params["ssh_keys"] = ssh_keys
         if user_data is not None:
             create_params["user_data"] = user_data
+        if volume_ids is not None and len(volume_ids) > 0:
+            create_params["volumes"] = volume_ids
 
         status_code, result = _get_results(self._config, "servers", body=create_params, method="POST")
         if status_code != 201 or result is None or ("error" in result and result["error"] is not None):
@@ -89,6 +91,7 @@ class HetznerCloudServer(object):
         self.outgoing_traffic = 0
         self.ingoing_traffic = 0
         self.included_traffic = 0
+        self.volume_ids = []
         self.root_password = ""
 
     def attach_iso(self, iso):
@@ -317,6 +320,7 @@ class HetznerCloudServer(object):
         cloud_server.outgoing_traffic = int(json["outgoing_traffic"])
         cloud_server.ingoing_traffic = int(json["ingoing_traffic"])
         cloud_server.included_traffic = int(json["included_traffic"])
+        cloud_server.volume_ids = json["volumes"]
         cloud_server.root_password = root_password
 
         return cloud_server
