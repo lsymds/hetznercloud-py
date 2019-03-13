@@ -15,6 +15,7 @@ class HetznerAuthenticationException(Exception):
 class HetznerInternalServerErrorException(Exception):
     def __init__(self, hetzner_message):
         super().__init__("The Hetzner Cloud API is currently unavailable: %s" % hetzner_message)
+        self.hetzner_message = hetzner_message
 
 
 class HetznerInvalidArgumentException(Exception):
@@ -23,6 +24,8 @@ class HetznerInvalidArgumentException(Exception):
             super().__init__("An invalid argument was (or was not) entered: %s, %s." % (argument, message))
         else:
             super().__init__("An invalid argument was (or was not) entered: %s." % argument)
+        self.argument = argument
+        self.message = message
 
 
 class HetznerActionException(Exception):
@@ -31,10 +34,12 @@ class HetznerActionException(Exception):
             super().__init__("Failed to perform the requested action: %s" % error_code)
         else:
             super().__init__("Failed to perform the requested action.")
+        self.error_code = error_code
 
 
 class HetznerWaitAttemptsExceededException(Exception):
     pass
+
 
 class HetznerRateLimitExceeded(Exception):
     pass
