@@ -251,7 +251,7 @@ class HetznerCloudServer(object):
 
         self.image_id = image
 
-        return HetznerCloudAction._load_from_json(self._config, result["action"])
+        return result["root_password"], HetznerCloudAction._load_from_json(self._config, result["action"])
 
     def reset(self):
         status_code, result = _get_results(self._config, "servers/%s/actions/reset" % self.id, method="POST")
