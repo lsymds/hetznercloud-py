@@ -1,5 +1,19 @@
 # Hetzner Cloud Python SDK
 
+## DEPRECATED
+
+THIS LIBRARY IS NO LONGER SUPPORTED. IT WILL RECEIVE NO UPDATES, NO SECURITY FIXES AND NO BUG FIXES. YOU SHOULD BE USING THE OFFICIAL HETZNERCLOUD PYTHON LIBRARY WHICH WAS RELEASED OVER 8 MONTHS AGO.
+
+PROCEED AT YOUR OWN RISK!
+
+
+
+---
+
+
+
+
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Build Status](https://travis-ci.org/thlisym/hetznercloud-py.svg?branch=develop)](https://travis-ci.org/elsyms/hetznercloud-py) 
 
 A Python 3 SDK for the new (and wonderful) Hetzner cloud service.
